@@ -7,4 +7,12 @@
     <string name="username_input_field" />
     <string name="password" />
     <string name="password_input_field" />
+    <string name="alarm_icon" />
+    <string name="alarm" />
+    <string name="stats_icon" />
+    <string name="stats" />
+    <string name="home_icon" />
+    <string name="home" />
+    <string name="profile" />
+    <string name="profile_icon" />
 </resources>
