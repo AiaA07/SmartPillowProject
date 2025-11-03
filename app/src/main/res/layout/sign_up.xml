@@ -40,8 +40,8 @@
 
     <Button
         android:id="@+id/SignUpBtnP"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="130dp"
+        android:layout_height="62dp"
         android:layout_marginBottom="140dp"
         android:backgroundTint="#FFFFFF"
         android:shadowColor="#FFFFFF"
@@ -50,6 +50,7 @@
         android:textColorHighlight="#FFFFFF"
         android:textColorHint="#FFFFFF"
         android:textColorLink="@color/white"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
