@@ -134,6 +134,7 @@
             android:orientation="vertical">
 
             <ImageView
+                android:id="@+id/Stats_Btn"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:contentDescription="@string/stats_icon"
@@ -159,6 +160,7 @@
             android:orientation="vertical">
 
             <ImageView
+                android:id="@+id/Alarm_Btn"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:contentDescription="@string/alarm_icon"
@@ -184,6 +186,7 @@
             android:orientation="vertical">
 
             <ImageView
+                android:id="@+id/Profile_Btn"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:contentDescription="@string/profile_icon"

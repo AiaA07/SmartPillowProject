@@ -2,7 +2,6 @@ package com.example.smartpillow;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -31,7 +30,6 @@ public class LoginPage extends AppCompatActivity {
         login = findViewById(R.id.Loginbtn);
         signUp = findViewById(R.id.SignUpBtn);
 
-        // Initialize Firebase instances
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
 
@@ -50,15 +48,9 @@ public class LoginPage extends AppCompatActivity {
             return;
         }
 
-        //convert username to email format
         String email = Username + "@smartpillow.com";
 
-        //Sign in with Firebase Authentication
         auth.signInWithEmailAndPassword(email, Password)
-
-       /* This line is equivalent to saying:
-        "Hey Firebase, when you finish trying to log this user in,
-        come back to my LoginPage and give me the result in a variable called task"*/
                 .addOnCompleteListener(this, task -> {
                     if(task.isSuccessful()){
                         Toast.makeText(LoginPage.this, "Login Successful!", Toast.LENGTH_SHORT).show();
@@ -66,9 +58,6 @@ public class LoginPage extends AppCompatActivity {
                         startActivity(gotoSign);
                         finish();
                     }else{
-
-                        //For authentication firebase, use: task.getException().getMessage(),
-                        //For firestore database firebase, use: e.getMessage()
                         Toast.makeText(this, "Login failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
