@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "747278464511",
+    "project_id": "smartpillowdata",
+    "storage_bucket": "smartpillowdata.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:747278464511:android:89d5dbc7e9fe975d7923ca",
+        "android_client_info": {
+          "package_name": "com.example.smartpillow"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7yIVaT0161ZVizT8oMTn-maRJBd8O9mo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:747278464511:android:bd7e6583697877637923ca",
+        "android_client_info": {
+          "package_name": "com.example.watch"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7yIVaT0161ZVizT8oMTn-maRJBd8O9mo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
