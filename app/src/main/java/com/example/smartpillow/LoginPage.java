@@ -17,7 +17,6 @@ public class LoginPage extends AppCompatActivity {
     private EditText password;
     private Button login;
     private Button signUp;
-    private FirebaseFirestore db;
     private FirebaseAuth auth;
 
     @Override
@@ -30,12 +29,10 @@ public class LoginPage extends AppCompatActivity {
         login = findViewById(R.id.Loginbtn);
         signUp = findViewById(R.id.SignUpBtn);
 
-        db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
 
         signUp.setOnClickListener(v -> GotoSignUp());
         login.setOnClickListener(v -> LoginUser());
-
     }
 
     private void LoginUser(){
@@ -67,7 +64,6 @@ public class LoginPage extends AppCompatActivity {
         Intent goSignUp = new Intent(LoginPage.this, SignUp.class);
         startActivity(goSignUp);
     }
-
 
 
 }
