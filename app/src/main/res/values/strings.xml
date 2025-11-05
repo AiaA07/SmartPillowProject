@@ -57,4 +57,9 @@
         libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
+    <string name="no_data_available" />
+    <string name="error_loading_data" >Error loading data: %s</string>
+    <string name="zero_minutes" />
+    <string name="zero_percent" />
+    <string name="default_bpm" />
 </resources>

@@ -16,7 +16,7 @@
             android:name=".ProfilePage"
             android:exported="false" />
         <activity
-            android:name=".AlarmPage"
+            android:name=".TrackingPage"
             android:exported="false" />
         <activity
             android:name=".StatsPage"
@@ -49,6 +49,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service android:name=".PhoneSleepTrackingService" />
     </application>
 
 </manifest>

@@ -3,23 +3,15 @@ package com.example.smartpillow;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.auth.User;
 
 public class HomePage extends AppCompatActivity {
 
     private ImageView statsBtn;
-    private ImageView alarmBtn;
+    private ImageView trackingBtn;
     private ImageView profileBtn;
 
     private TextView welcome;
@@ -31,12 +23,12 @@ public class HomePage extends AppCompatActivity {
         setContentView(R.layout.home_page);
 
         statsBtn = findViewById(R.id.Stats_Btn);
-        alarmBtn = findViewById(R.id.Alarm_Btn);
+        trackingBtn = findViewById(R.id.Tracking_Btn);
         profileBtn = findViewById(R.id.Profile_Btn);
         welcome = findViewById(R.id.WelcomeText);
 
         statsBtn.setOnClickListener(v -> GotoStats());
-        alarmBtn.setOnClickListener(v -> GotoAlarm());
+        trackingBtn.setOnClickListener(v -> GotoTracking());
         profileBtn.setOnClickListener(v -> GotoProfile());
     }
 
@@ -48,9 +40,9 @@ public class HomePage extends AppCompatActivity {
 
     }
 
-    private void GotoAlarm(){
-        Intent alarm = new Intent(HomePage.this, AlarmPage.class);
-        startActivity(alarm);
+    private void GotoTracking(){
+        Intent tracking = new Intent(HomePage.this, TrackingPage.class);
+        startActivity(tracking);
     }
 
     private void GotoProfile(){

@@ -23,6 +23,8 @@ public class SignUp extends AppCompatActivity {
     private EditText RepassSP;
     private Button SignUpBtn2;
 
+    private Button BackBtn2;
+
     private FirebaseFirestore db;
 
 
@@ -37,14 +39,25 @@ public class SignUp extends AppCompatActivity {
             UsernameSP = findViewById(R.id.CreateUsername);
             PasswordSP = findViewById(R.id.CreatePassword);
             RepassSP =  findViewById(R.id.RenterPass);
-            SignUpBtn2 = findViewById(R.id.SignUpBtnP);
+            SignUpBtn2 = findViewById(R.id.SignUpBtn);
+            BackBtn2 = findViewById(R.id.BackBtn);
+
 
             db = FirebaseFirestore.getInstance();
 
 
             SignUpBtn2.setOnClickListener(v -> signUpUser());
+            BackBtn2.setOnClickListener(v-> GoBack());
 
         };
+
+
+    private void GoBack(){
+
+        Intent login = new Intent(SignUp.this, LoginPage.class);
+        startActivity(login);
+        }
+
 
 
     private void signUpUser() {
