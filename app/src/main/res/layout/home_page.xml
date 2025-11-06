@@ -2,91 +2,168 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HomePage"
-    android:background="@android:color/black">
+    android:background="@android:color/black"
+    tools:context=".HomePage">
 
-    <TextView
-        android:id="@+id/HomeText"
-        android:layout_width="wrap_content"
+    <!-- Header Section -->
+    <LinearLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
-        android:text="Home"
-        android:textColor="#FFFFFF"
-        android:textSize="48sp"
-        app:layout_constraintBottom_toTopOf="@+id/WelcomeText"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="32dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.231"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.378" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <TextView
-        android:id="@+id/WelcomeText"
-        android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/HomeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Home"
+            android:textColor="#FFFFFF"
+            android:textSize="36sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.02" />
+
+        <TextView
+            android:id="@+id/WelcomeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Welcome, User!"
+            android:textColor="#E0E0E0"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
+    <!-- Sleep Goal Section -->
+    <LinearLayout
+        android:id="@+id/sleepGoalSection"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="28dp"
-        android:text="Welcome, [user]!"
-        android:textColor="#FFFFFF"
-        android:textSize="24sp"
-        app:layout_constraintBottom_toTopOf="@+id/SleepGoalText"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="24dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.212"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/headerLayout">
 
-    <TextView
-        android:id="@+id/SleepGoalText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:text="Set sleep goal:"
-        android:textColor="#FFFFFF"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@+id/GoalTextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.159"
-        app:layout_constraintStart_toStartOf="parent" />
+        <TextView
+            android:id="@+id/SleepGoalText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sleep Goal"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/TipsText"
-        android:layout_width="54dp"
-        android:layout_height="34dp"
-        android:layout_marginBottom="20dp"
-        android:text="Tips:"
-        android:textColor="#FFFFFF"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@+id/TipsTextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.14"
-        app:layout_constraintStart_toStartOf="parent" />
+        <TextView
+            android:id="@+id/GoalTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="No sleep goal set"
+            android:textColor="#BB86FC"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/GoalTextView"
-        android:layout_width="265dp"
-        android:layout_height="68dp"
-        android:layout_marginBottom="36dp"
-        android:text="TextView"
-        android:textColor="#FFFFFF"
-        app:layout_constraintBottom_toTopOf="@+id/TipsText"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.342"
-        app:layout_constraintStart_toStartOf="parent" />
+        <Button
+            android:id="@+id/SetGoalBtn"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="#4CAF50"
+            android:text="Set Sleep Goal"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
-    <!-- Bottom Navigation -->
-    <TextView
-        android:id="@+id/TipsTextView"
-        android:layout_width="267dp"
-        android:layout_height="81dp"
-        android:layout_marginBottom="116dp"
-        android:text="TextView"
-        android:textColor="#FFFEFE"
+    </LinearLayout>
+
+    <!-- Sleep Tips Section -->
+    <LinearLayout
+        android:id="@+id/sleepTipsSection"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="24dp"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.333"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sleepGoalSection">
 
+        <TextView
+            android:id="@+id/TipsText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sleep Tips"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/TipsTextView"
+            android:layout_width="280dp"
+            android:layout_height="120dp"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:lineSpacingExtra="6dp"
+            android:text="Loading sleep tips..."
+            android:textColor="#E0E0E0"
+            android:textSize="14sp"
+            android:padding="16dp"
+            android:background="#1E1E1E" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Tip rotates every 15 seconds"
+            android:textColor="#666666"
+            android:textSize="10sp" />
+
+    </LinearLayout>
+
+    <!-- Hidden Input Layout (Keep for compatibility) -->
+    <LinearLayout
+        android:id="@+id/GoalInputLayout"
+        android:layout_width="267dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/GoalTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <EditText
+            android:id="@+id/GoalInput"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#4CAF50"
+            android:hint="Enter hours (1-12)"
+            android:inputType="number"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#AAAAAA" />
+
+        <Button
+            android:id="@+id/SaveGoalBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:backgroundTint="#4CAF50"
+            android:text="Save"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
+
+    <!-- Bottom Navigation - ALL ImageView IDs PRESERVED -->
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
@@ -133,6 +210,7 @@
             android:gravity="center"
             android:orientation="vertical">
 
+            <!-- Stats_Btn ID PRESERVED -->
             <ImageView
                 android:id="@+id/Stats_Btn"
                 android:layout_width="32dp"
@@ -159,6 +237,7 @@
             android:gravity="center"
             android:orientation="vertical">
 
+            <!-- Tracking_Btn ID PRESERVED -->
             <ImageView
                 android:id="@+id/Tracking_Btn"
                 android:layout_width="32dp"
@@ -185,6 +264,7 @@
             android:gravity="center"
             android:orientation="vertical">
 
+            <!-- Profile_Btn ID PRESERVED -->
             <ImageView
                 android:id="@+id/Profile_Btn"
                 android:layout_width="32dp"
@@ -199,9 +279,6 @@
                 android:textColor="@android:color/black"
                 android:textSize="12sp" />
         </LinearLayout>
-
-
     </LinearLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
