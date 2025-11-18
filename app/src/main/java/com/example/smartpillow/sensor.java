@@ -1,81 +1,102 @@
 package com.example.smartpillow;
 
-import static android.content.ContentValues.TAG;
-
-import androidx.appcompat.app.AppCompatActivity;
+import android.content.Context;
+import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.widget.TextView;
-import android.hardware.Sensor;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import com.google.firebase.firestore.FirebaseFirestore;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 public class sensor extends AppCompatActivity implements SensorEventListener {
+
+
+    private static final String TAG = "SensorActivity";
+
     private SensorManager sensorManager;
     private Sensor accelerometer;
 
+    private long lastUpdate = 0L;
+    private static final long UPDATE_INTERVAL_MS = 200L;
+
+    private TextView tvX;
+    private TextView tvY;
+    private TextView tvZ;
+
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.stats_page);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.tracking_page);
 
-        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        tvX = findViewById(R.id.TexttvX);
+        tvY = findViewById(R.id.TexttvY);
+        tvZ = findViewById(R.id.TexttvZ);
 
-        if (accelerometer != null) {
-            sensorManager.registerListener((SensorEventListener) this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+
+        if (sensorManager != null) {
+            accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         }
 
+        if (accelerometer == null) {
+            Log.w(TAG, "No accelerometer sensor found on this device.");
+        }
+
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (accelerometer != null) {
+            sensorManager.registerListener(
+                    this,
+                    accelerometer,
+                    SensorManager.SENSOR_DELAY_NORMAL
+            );
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        sensorManager.unregisterListener(this);
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        android.util.Log.d(TAG , "onSensorChanged: This is working now.");
-        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            long currentTime = System.currentTimeMillis();
+        if (event.sensor.getType() != Sensor.TYPE_ACCELEROMETER) return;
 
-            // Record every 200ms to avoid overloading Firestore
-            long lastUpdate = 0;
-            if ((currentTime - lastUpdate) > 200) {
-                lastUpdate = currentTime;
+        long currentTime = System.currentTimeMillis();
 
-                float x = event.values[0];
-                float y = event.values[1];
-                float z = event.values[2];
+        float x = event.values[0];
+        float y = event.values[1];
+        float z = event.values[2];
 
-                // Create timestamp
-                String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault())
-                        .format(new Date(currentTime));
+        // Update UI
+        tvX.setText("X: " + x);
+        tvY.setText("Y: " + y);
+        tvZ.setText("Z: " + z);
 
-                // Create data map
-                Map<String, Object> data = new HashMap<>();
-                data.put("x", x);
-                data.put("y", y);
-                data.put("z", z);
-                data.put("timestamp", timestamp);
+        // Optional throttling if you plan future logic
+        if ((currentTime - lastUpdate) >= UPDATE_INTERVAL_MS) {
+            lastUpdate = currentTime;
 
-                // Upload to Firestore
-                FirebaseFirestore db = FirebaseFirestore.getInstance();
-                db.collection("accelerometer_data")
-                        .add(data)
-                        .addOnSuccessListener(documentReference ->
-                                Log.d("Firestore", "Data added with ID: " + documentReference.getId()))
-                        .addOnFailureListener(e ->
-                                Log.w("Firestore", "Error adding document", e));
-            }
+            Log.d(TAG, "Accelerometer: X=" + x + " Y=" + y + " Z=" + z);
         }
     }
 
-
     @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    public void onAccuracyChanged(Sensor sensor, int i) {
 
     }
 }

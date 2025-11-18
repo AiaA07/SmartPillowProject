@@ -4,10 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".TrackingPage"
+    tools:context=".sensor"
     android:background="@android:color/black">
 
     <!-- Main Tracking Content -->
+
+
+
 
     <!-- Bottom Navigation -->
     <LinearLayout
@@ -37,17 +40,6 @@
             android:textSize="28sp"
             android:textStyle="bold" />
 
-        <Button
-            android:id="@+id/start_tracking_btn"
-            android:layout_width="280dp"
-            android:layout_height="90dp"
-            android:layout_marginBottom="20dp"
-            android:backgroundTint="#4CAF50"
-            android:text="START SLEEP TRACKING"
-            android:textColor="@android:color/white"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
         <!-- Stop Tracking Button -->
         <Button
             android:id="@+id/stop_tracking_btn"
@@ -75,36 +67,27 @@
 
 
         <!-- Instructions -->
-        <TextView
-            android:id="@+id/instructions_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:gravity="center"
-            android:lineSpacingExtra="8dp"
-            android:text="Instructions:"
-            android:textColor="#FFFFFF"
-            android:textSize="34sp" />
 
         <TextView
-            android:id="@+id/timerTextView"
+            android:id="@+id/TexttvX"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:gravity="center"
-            android:lineSpacingExtra="8dp"
-            android:text=" 00:00:00 "
-            android:textColor="#FFFFFF"
-            android:textSize="16sp" />
+            android:text="X:"
+            android:textColor="#FFFFFF" />
 
-        <Button
-            android:id="@+id/startButton"
-            android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/TexttvY"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/timerTextView"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="20dp"
-            android:text="Start Timer" />
+            android:text="Y:"
+            android:textColor="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/TexttvZ"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Z:"
+            android:textColor="#FFFFFF" />
 
     </LinearLayout>
 
@@ -221,7 +204,8 @@
                 android:textColor="@android:color/black"
                 android:textSize="12sp" />
         </LinearLayout>
-
     </LinearLayout>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
