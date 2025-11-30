@@ -128,6 +128,20 @@
             android:textSize="10sp" />
 
     </LinearLayout>
+    <Button
+        android:id="@+id/btnWhiteNoise"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:text="White Noise"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:backgroundTint="#6200EE"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/sleepTipsSection"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 
     <!-- Hidden Input Layout (Keep for compatibility) -->
     <LinearLayout
