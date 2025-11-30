@@ -17,7 +17,7 @@
             android:name=".ProfilePage"
             android:exported="false" />
         <activity
-            android:name=".TrackingPage"
+            android:name=".sensor"
             android:exported="false" />
         <activity
             android:name=".StatsPage"
@@ -35,20 +35,12 @@
         <activity
             android:name=".HomePage"
             android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".SignUp"
             android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
     </application>
 

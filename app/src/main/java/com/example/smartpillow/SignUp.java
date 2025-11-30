@@ -49,7 +49,7 @@ public class SignUp extends AppCompatActivity {
             SignUpBtn2.setOnClickListener(v -> signUpUser());
             BackBtn2.setOnClickListener(v-> GoBack());
 
-        };
+        }
 
 
     private void GoBack(){

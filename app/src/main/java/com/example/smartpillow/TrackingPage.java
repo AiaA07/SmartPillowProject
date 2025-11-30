@@ -1,4 +1,4 @@
-package com.example.smartpillow;
+/*package com.example.smartpillow;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -60,3 +60,4 @@ public class TrackingPage extends AppCompatActivity {
 
 
 }
+*/

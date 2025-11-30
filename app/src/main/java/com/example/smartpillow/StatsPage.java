@@ -38,7 +38,7 @@ public class StatsPage extends AppCompatActivity {
     }
 
     private void GoToTracking2(){
-        Intent track2 = new Intent(StatsPage.this, TrackingPage.class);
+        Intent track2 = new Intent(StatsPage.this, sensor.class);
         startActivity(track2);
     }
 

@@ -199,6 +199,7 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
+
         <LinearLayout
             android:id="@+id/stats_tab"
             android:layout_width="0dp"
@@ -282,3 +283,9 @@
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+
+
