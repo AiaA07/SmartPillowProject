@@ -7,7 +7,6 @@ import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-
 import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,59 +14,60 @@ import android.widget.Toast;
 import java.util.Date;
 import com.google.firebase.auth.FirebaseAuth;
 
-
 public class SignUp extends AppCompatActivity {
 
     private EditText UsernameSP;
     private EditText PasswordSP;
     private EditText RepassSP;
     private Button SignUpBtn2;
-
     private Button BackBtn2;
 
+    // NEW: profile button
+    private Button ProfileBtn;
+
     private FirebaseFirestore db;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sign_up);
 
+        UsernameSP = findViewById(R.id.CreateUsername);
+        PasswordSP = findViewById(R.id.CreatePassword);
+        RepassSP  = findViewById(R.id.RenterPass);
+        SignUpBtn2 = findViewById(R.id.SignUpBtn);
+        BackBtn2   = findViewById(R.id.BackBtn);
 
+        // ⭐ NEW: connect to the button you added in XML
+        ProfileBtn = findViewById(R.id.buttonOpenProfile);
 
-            UsernameSP = findViewById(R.id.CreateUsername);
-            PasswordSP = findViewById(R.id.CreatePassword);
-            RepassSP =  findViewById(R.id.RenterPass);
-            SignUpBtn2 = findViewById(R.id.SignUpBtn);
-            BackBtn2 = findViewById(R.id.BackBtn);
+        db = FirebaseFirestore.getInstance();
 
+        SignUpBtn2.setOnClickListener(v -> signUpUser());
+        BackBtn2.setOnClickListener(v -> GoBack());
 
-            db = FirebaseFirestore.getInstance();
+        // ⭐ NEW: open ProfileActivity when pressed
+        ProfileBtn.setOnClickListener(v -> openProfile());
+    }
 
+    // NEW: method to start ProfileActivity
+    private void openProfile() {
+        Intent profileIntent = new Intent(SignUp.this, ProfileActivity.class);
+        startActivity(profileIntent);
+    }
 
-            SignUpBtn2.setOnClickListener(v -> signUpUser());
-            BackBtn2.setOnClickListener(v-> GoBack());
-
-        };
-
-
-    private void GoBack(){
-
+    private void GoBack() {
         Intent login = new Intent(SignUp.this, LoginPage.class);
         startActivity(login);
-        }
-
-
+    }
 
     private void signUpUser() {
-        String username = UsernameSP.getText().toString().trim();
-        String password = PasswordSP.getText().toString().trim();
+        String username   = UsernameSP.getText().toString().trim();
+        String password   = PasswordSP.getText().toString().trim();
         String confirmPass = RepassSP.getText().toString().trim();
 
         if (username.isEmpty() || password.isEmpty() || confirmPass.isEmpty()) {
             Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
-
             return;
         }
 
@@ -75,7 +75,6 @@ public class SignUp extends AppCompatActivity {
             Toast.makeText(this, "Password does not match", Toast.LENGTH_SHORT).show();
             return;
         }
-
 
         if (password.length() < 6) {
             Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
@@ -86,7 +85,7 @@ public class SignUp extends AppCompatActivity {
                 .whereEqualTo("username", username)
                 .get()
                 .addOnCompleteListener(task -> {
-                    if(task.isSuccessful()) {
+                    if (task.isSuccessful()) {
                         if (task.getResult().isEmpty()) {
                             String email = username + "@smartpillow.com";
                             createAuthUser(username, email, password);
@@ -100,16 +99,9 @@ public class SignUp extends AppCompatActivity {
     }
 
     private void createAuthUser(String username, String email, String password) {
-
-
         FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
-
-
-                    .addOnCompleteListener(task -> {
-
-
+                .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-
                         storeUsernameInFirestore(username);
                     } else {
                         Toast.makeText(SignUp.this, "Sign up failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
@@ -117,19 +109,14 @@ public class SignUp extends AppCompatActivity {
                 });
     }
 
-
     private void storeUsernameInFirestore(String username) {
-
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
 
         Map<String, Object> user = new HashMap<>();
         user.put("username", username);
         user.put("createdAt", new Date());
 
-
         db.collection("users").document(userId)
-
                 .set(user)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(SignUp.this, "Account created successfully!", Toast.LENGTH_SHORT).show();
@@ -140,9 +127,5 @@ public class SignUp extends AppCompatActivity {
                 .addOnFailureListener(e -> {
                     Toast.makeText(SignUp.this, "Error saving user data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
-
-
     }
-
-
 }

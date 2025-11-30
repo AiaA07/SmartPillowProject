@@ -4,35 +4,25 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".sensor"
+    tools:context=".TrackingPage"
     android:background="@android:color/black">
 
-    <!-- Main Tracking Content -->
-
-
-
-
-    <!-- Bottom Navigation -->
+    <!-- Main tracking content -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:gravity="center"
         android:orientation="vertical"
         android:padding="32dp"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_nav"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0">
+        app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Tracking Icon/Status -->
-
-        <!-- Start Tracking Button -->
         <TextView
             android:id="@+id/tracking_status_text"
             android:layout_width="match_parent"
-            android:layout_height="51dp"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="40dp"
             android:gravity="center"
             android:text="READY TO TRACK"
@@ -40,7 +30,6 @@
             android:textSize="28sp"
             android:textStyle="bold" />
 
-        <!-- Stop Tracking Button -->
         <Button
             android:id="@+id/stop_tracking_btn"
             android:layout_width="280dp"
@@ -52,7 +41,6 @@
             android:textStyle="bold"
             android:visibility="gone" />
 
-        <!-- Session Info -->
         <TextView
             android:id="@+id/session_info_text"
             android:layout_width="match_parent"
@@ -64,9 +52,6 @@
             android:textSize="16sp"
             android:textStyle="bold"
             android:visibility="gone" />
-
-
-        <!-- Instructions -->
 
         <TextView
             android:id="@+id/TexttvX"
@@ -91,8 +76,9 @@
 
     </LinearLayout>
 
+    <!-- Bottom Navigation -->
     <LinearLayout
-        android:id="@+id/linearLayout"
+        android:id="@+id/bottom_nav"
         android:layout_width="match_parent"
         android:layout_height="70dp"
         android:background="@android:color/white"
@@ -113,7 +99,7 @@
             android:orientation="vertical">
 
             <ImageView
-                android:id="@+id/home3_Btn"
+                android:id="@+id/home_Btn"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:contentDescription="Home"
@@ -139,7 +125,7 @@
             android:orientation="vertical">
 
             <ImageView
-                android:id="@+id/stats3_Btn"
+                android:id="@+id/stats_Btn"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:contentDescription="Stats"
@@ -165,11 +151,11 @@
             android:orientation="vertical">
 
             <ImageView
-                android:id="@+id/tracking3_Btn"
+                android:id="@+id/tracking_Btn"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:contentDescription="Tracking"
-                android:src="@drawable/alarm" />  <!-- Using alarm icon for now -->
+                android:src="@drawable/alarm" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -191,7 +177,7 @@
             android:orientation="vertical">
 
             <ImageView
-                android:id="@+id/profile3_Btn"
+                android:id="@+id/profile_Btn"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:contentDescription="Profile"
@@ -205,7 +191,5 @@
                 android:textSize="12sp" />
         </LinearLayout>
     </LinearLayout>
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

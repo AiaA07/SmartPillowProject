@@ -65,9 +65,16 @@ public class HomePage extends AppCompatActivity {
         goalTextView = findViewById(R.id.GoalTextView);
         tipsTextView = findViewById(R.id.TipsTextView);
 
+        Button btnWhiteNoise = findViewById(R.id.btnWhiteNoise);
+        btnWhiteNoise.setOnClickListener(v -> {
+            Intent intent = new Intent(HomePage.this, WhiteNoisePage.class);
+            startActivity(intent);
+        });
+
+
         // Navigation
         findViewById(R.id.Stats_Btn).setOnClickListener(v -> startActivity(new Intent(this, StatsPage.class)));
-        findViewById(R.id.Tracking_Btn).setOnClickListener(v -> startActivity(new Intent(this, TrackingPage.class)));
+        findViewById(R.id.Tracking_Btn).setOnClickListener(v -> startActivity(new Intent(this, sensor.class)));
         findViewById(R.id.Profile_Btn).setOnClickListener(v -> startActivity(new Intent(this, ProfilePage.class)));
 
         // Set Sleep Goal button - now using dialog

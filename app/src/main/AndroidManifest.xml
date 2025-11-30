@@ -17,12 +17,15 @@
             android:name=".ProfilePage"
             android:exported="false" />
         <activity
-            android:name=".TrackingPage"
+            android:name=".sensor"
             android:exported="false" />
         <activity
             android:name=".StatsPage"
             android:exported="false"
             android:theme="@style/Theme.SmartPillow" />
+        <activity
+            android:name=".WhiteNoisePage"
+            android:exported="false" />
         <activity
             android:name=".LoginPage"
             android:exported="true">
@@ -35,21 +38,16 @@
         <activity
             android:name=".HomePage"
             android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".SignUp"
             android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
+
+
+
     </application>
 
 </manifest>
