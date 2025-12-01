@@ -1,4 +1,4 @@
-package com.example.smartpillow;
+/*package com.example.smartpillow;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -11,5 +11,5 @@ private static final String TAG = "GyroscopeActivity";
 
 
 
-
 }
+*/
