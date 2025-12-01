@@ -11,6 +11,5 @@ private static final String TAG = "GyroscopeActivity";
 
 
 
-
 }
 */
