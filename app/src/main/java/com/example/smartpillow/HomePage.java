@@ -152,8 +152,18 @@ public class HomePage extends AppCompatActivity {
             db.collection("users").document(userId).get()
                     .addOnSuccessListener(documentSnapshot -> {
                         if (documentSnapshot.exists() && documentSnapshot.contains("sleepGoal")) {
-                            String goal = documentSnapshot.getString("sleepGoal");
-                            goalTextView.setText("Current Goal: " + goal + " hours per night");
+
+                            Object goalObj = documentSnapshot.get("sleepGoal");
+                            String goalText;
+
+                            if (goalObj != null) {
+                                goalText = String.valueOf(goalObj);  // Convert number or string safely
+                            } else {
+                                goalText = "8"; // default if somehow null
+                            }
+
+                            goalTextView.setText("Current Goal: " + goalText + " hours per night");
+
                         } else {
                             goalTextView.setText("No sleep goal set");
                         }
@@ -163,6 +173,7 @@ public class HomePage extends AppCompatActivity {
                     });
         }
     }
+
 
     private void setupTipsRotation() {
         showRandomTip();
