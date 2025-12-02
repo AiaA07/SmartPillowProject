@@ -87,6 +87,16 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
         tvY.setText("Y: " + y);
         tvZ.setText("Z: " + z);
 
+        //Sleep metric implementation
+        float minX = -10;
+        float maxX = 10;
+
+        if(x >= minX && x <= maxX)
+            tvX.setText("X: " + x + " (Normal)");
+        else
+            tvX.setText("X: " + x + " (Abnormal)");
+
+
         // Optional throttling if you plan future logic
         if ((currentTime - lastUpdate) >= UPDATE_INTERVAL_MS) {
             lastUpdate = currentTime;
