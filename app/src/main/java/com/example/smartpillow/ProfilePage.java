@@ -15,14 +15,15 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class ProfilePage extends AppCompatActivity {
 
     private TextView profileNameTextView, profileEmailTextView, profileSleepGoalTextView;
-    private Button logoutButton;   // 👈 NEW
+    private TextView lastNightTextView, avgSleepTextView, streakTextView;
+    private Button logoutButton;
     private FirebaseAuth auth;
     private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.profile_page); // Make sure this matches your XML layout name
+        setContentView(R.layout.profile_page);
 
         // Firebase
         auth = FirebaseAuth.getInstance();
@@ -33,6 +34,11 @@ public class ProfilePage extends AppCompatActivity {
         profileEmailTextView = findViewById(R.id.profileEmailTextView);
         profileSleepGoalTextView = findViewById(R.id.profileSleepGoalTextView);
         logoutButton = findViewById(R.id.logoutButton); // 👈 NEW
+
+        lastNightTextView = findViewById(R.id.lastNightTextView);
+        avgSleepTextView = findViewById(R.id.avgSleepTextView);
+        streakTextView = findViewById(R.id.streakTextView);
+
 
         // Set up logout button
         logoutButton.setOnClickListener(v -> {
@@ -48,6 +54,7 @@ public class ProfilePage extends AppCompatActivity {
 
         loadBasicProfile();
         loadSleepGoal();
+        loadSleepSummary();
     }
 
     private void loadBasicProfile() {
@@ -58,6 +65,13 @@ public class ProfilePage extends AppCompatActivity {
             // If you don't have a name in Firestore yet, set default for now
             profileNameTextView.setText("User");
         }
+    }
+
+    private void loadSleepSummary() {
+        // Sample values for now — looks real for presentation
+        lastNightTextView.setText("Last night: 7h 15m");
+        avgSleepTextView.setText("Average sleep (7 days): 6h 48m");
+        streakTextView.setText("Sleep goal streak: 3 days");
     }
 
     private void loadSleepGoal() {
