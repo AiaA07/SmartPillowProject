@@ -184,6 +184,92 @@
                 android:layout_marginTop="4dp" />
         </LinearLayout>
 
+        <!-- Sleep Goal Progress Card -->
+        <LinearLayout
+            android:id="@+id/sleepGoalCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginTop="16dp"
+            android:background="#FFFFFF"
+            android:elevation="2dp">
+
+            <TextView
+                android:id="@+id/sleepGoalProgressTitleTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sleep Goal Progress"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/sleepGoalProgressLabelTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0% of goal reached"
+                android:layout_marginBottom="8dp" />
+
+            <ProgressBar
+                android:id="@+id/sleepGoalProgressBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="16dp"
+                android:max="100"
+                android:progress="0" />
+
+        </LinearLayout>
+
+        <!-- Weekly Sleep Summary Card -->
+        <LinearLayout
+            android:id="@+id/weeklySummaryCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginTop="16dp"
+            android:background="#FFFFFF"
+            android:elevation="2dp">
+
+            <TextView
+                android:id="@+id/weeklySummaryTitleTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="This Week's Sleep Summary"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/weeklyTotalSleepTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Total sleep: -- hrs"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/weeklyAverageSleepTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Average per night: -- hrs"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/weeklyBestNightTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Best night: -- hrs" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/editProfileButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Edit Profile"
+            android:layout_marginTop="16dp" />
+
 
         <!-- Logout button -->
         <Button
