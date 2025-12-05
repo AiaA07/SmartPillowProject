@@ -3,12 +3,29 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    android:background="#F3F4F6">
+    android:background="#F3F4F6"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+
+        <!-- Top bar with Back button -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="start|center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <Button
+                android:id="@+id/backButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="← Back"
+                android:padding="8dp" />
+        </LinearLayout>
 
         <!-- Profile header -->
         <LinearLayout
@@ -36,6 +53,12 @@
                 android:padding="8dp"
                 android:adjustViewBounds="true" />
 
+            <Button
+                android:id="@+id/changePhotoButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Change Photo"
+                android:layout_marginBottom="16dp" />
 
             <!-- Name -->
             <TextView
@@ -52,20 +75,20 @@
                 android:id="@+id/profileEmailTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
                 android:text="ana@example.com"
-                android:textSize="14sp"
-                android:textColor="#555555"
-                android:layout_marginBottom="4dp" />
+                android:textColor="#000000"
+                android:textSize="14sp" />
 
             <!-- Sleep goal -->
             <TextView
                 android:id="@+id/profileSleepGoalTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
                 android:text="Sleep goal: 8 hours/day"
-                android:textSize="14sp"
-                android:textColor="#777777"
-                android:layout_marginTop="4dp" />
+                android:textColor="#000000"
+                android:textSize="14sp" />
 
         </LinearLayout>
 
@@ -93,7 +116,6 @@
             android:textSize="14sp"
             android:layout_marginTop="4dp" />
 
-
         <!-- Section title -->
         <TextView
             android:layout_width="wrap_content"
@@ -101,6 +123,7 @@
             android:text="My Sleep Tools"
             android:textStyle="bold"
             android:textSize="16sp"
+            android:layout_marginTop="16dp"
             android:layout_marginBottom="8dp" />
 
         <!-- Sleep Summary row -->
@@ -184,6 +207,91 @@
                 android:layout_marginTop="4dp" />
         </LinearLayout>
 
+        <!-- Sleep Goal Progress Card -->
+        <LinearLayout
+            android:id="@+id/sleepGoalCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginTop="16dp"
+            android:background="#FFFFFF"
+            android:elevation="2dp">
+
+            <TextView
+                android:id="@+id/sleepGoalProgressTitleTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sleep Goal Progress"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/sleepGoalProgressLabelTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0% of goal reached"
+                android:layout_marginBottom="8dp" />
+
+            <ProgressBar
+                android:id="@+id/sleepGoalProgressBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="16dp"
+                android:max="100"
+                android:progress="0" />
+
+        </LinearLayout>
+
+        <!-- Weekly Sleep Summary Card -->
+        <LinearLayout
+            android:id="@+id/weeklySummaryCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginTop="16dp"
+            android:background="#FFFFFF"
+            android:elevation="2dp">
+
+            <TextView
+                android:id="@+id/weeklySummaryTitleTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="This Week's Sleep Summary"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/weeklyTotalSleepTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Total sleep: -- hrs"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/weeklyAverageSleepTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Average per night: -- hrs"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/weeklyBestNightTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Best night: -- hrs" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/editProfileButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Edit Profile"
+            android:layout_marginTop="16dp" />
 
         <!-- Logout button -->
         <Button
@@ -193,7 +301,8 @@
             android:text="Log out"
             android:backgroundTint="#E53935"
             android:textColor="@android:color/white"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="24dp" />
 
     </LinearLayout>
 

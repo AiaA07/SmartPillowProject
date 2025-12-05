@@ -51,6 +51,7 @@ public class LoginPage extends AppCompatActivity {
         login.setOnClickListener(v -> LoginUser());
     }
 
+
     private void LoginUser() {
         String inputUsername = username.getText().toString().trim();
         String inputPassword = password.getText().toString().trim();

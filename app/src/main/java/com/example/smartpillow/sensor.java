@@ -1,12 +1,14 @@
 package com.example.smartpillow;
 
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -29,6 +31,10 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
     private TextView tvX;
     private TextView tvY;
     private TextView tvZ;
+    private Button home3Btn;
+    private Button stats3Btn;
+    private Button profile3Btn;
+
 
 
     @Override
@@ -40,6 +46,12 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
         tvX = findViewById(R.id.TexttvX);
         tvY = findViewById(R.id.TexttvY);
         tvZ = findViewById(R.id.TexttvZ);
+        findViewById(R.id.home3_Btn).setOnClickListener(v -> startActivity(new Intent(this, HomePage.class)));
+        findViewById(R.id.stats3_Btn).setOnClickListener(v -> startActivity(new Intent(this, StatsPage.class)));
+        findViewById(R.id.profile3_Btn).setOnClickListener(v -> startActivity(new Intent(this, ProfilePage.class)));
+
+
+
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
