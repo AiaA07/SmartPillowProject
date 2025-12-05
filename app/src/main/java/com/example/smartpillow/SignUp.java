@@ -1,6 +1,7 @@
 package com.example.smartpillow;
 
 import android.content.Intent;
+import android.database.SQLException;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -43,42 +44,17 @@ public class SignUp extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
 
-        // Initialize SQLite database - FIXED: Use getApplicationContext()
+        // Initialize SQLite database
+        dbManager = new DatabaseManager(this);
         try {
-            dbManager = new DatabaseManager(getApplicationContext());
             dbManager.open();
-            Log.d(TAG, "Database opened successfully");
-
-            // Debug: Check if database was created
-            debugDatabaseSetup();
-
-        } catch (Exception e) {
-            Toast.makeText(this, "Database initialization error", Toast.LENGTH_SHORT).show();
-            Log.e(TAG, "DB Open Error: " + e.getMessage());
-            e.printStackTrace();
+        } catch (SQLException e) {
+            Log.e(TAG, "Error opening database", e);
+            Toast.makeText(this, "Error opening database", Toast.LENGTH_SHORT).show();
         }
 
         SignUpBtn2.setOnClickListener(v -> signUpUser());
         BackBtn2.setOnClickListener(v -> GoBack());
-    }
-
-    private void debugDatabaseSetup() {
-        try {
-            // Check if we can query the database
-            android.database.Cursor cursor = dbManager.fetch();
-            if (cursor != null) {
-                int count = cursor.getCount();
-                Log.d(TAG, "Database has " + count + " users");
-                cursor.close();
-            }
-
-            // Check table structure
-            Log.d(TAG, "Table name: " + DatabaseHelper.TABLE_NAME);
-            Log.d(TAG, "Database name: " + DatabaseHelper.DATABASE_NAME);
-
-        } catch (Exception e) {
-            Log.e(TAG, "Debug error: " + e.getMessage());
-        }
     }
 
     private void GoBack() {
@@ -114,32 +90,24 @@ public class SignUp extends AppCompatActivity {
             return;
         }
 
-        // Create Firebase email
+        // Step 1: Save to SQLite (local storage)
         String email = username + "@smartpillow.com";
+        saveToSQLite(username, password, email);
 
-        // Create user in Firebase Authentication
+        // Step 2: Create Firebase user and save to Firestore
         auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         // Firebase auth successful
                         String userId = auth.getCurrentUser().getUid();
                         Log.d(TAG, "Firebase auth success, userId: " + userId);
-
-                        // Step 1: Save to SQLite (local storage)
-                        saveToSQLite(username, password, email, userId);
-
-                        // Step 2: Save to Firestore (cloud storage)
                         saveToFirestore(username, email, userId);
-
                     } else {
                         // Firebase auth failed
                         String errorMsg = task.getException() != null ?
                                 task.getException().getMessage() : "Unknown error";
                         Toast.makeText(SignUp.this, "Firebase error: " + errorMsg, Toast.LENGTH_SHORT).show();
                         Log.e(TAG, "Firebase Auth Error: " + errorMsg);
-
-                        // Still save to SQLite for offline use
-                        saveToSQLite(username, password, email, null);
                     }
                 });
     }
@@ -181,7 +149,7 @@ public class SignUp extends AppCompatActivity {
         }
     }
 
-    private void saveToSQLite(String username, String password, String email, String firebaseUserId) {
+    private void saveToSQLite(String username, String password, String email) {
         if (dbManager == null) {
             Log.e(TAG, "Cannot save to SQLite - DatabaseManager is null!");
             Toast.makeText(this, "Database not initialized", Toast.LENGTH_SHORT).show();
@@ -197,9 +165,6 @@ public class SignUp extends AppCompatActivity {
 
             // Show success message
             Toast.makeText(this, "Account created (saved locally)", Toast.LENGTH_SHORT).show();
-
-            // Verify the user was saved
-            verifyUserInSQLite(username);
 
             // Navigate to login
             Intent intent = new Intent(SignUp.this, LoginPage.class);
@@ -218,30 +183,6 @@ public class SignUp extends AppCompatActivity {
                 errorMsg += "Unknown error";
             }
             Toast.makeText(this, errorMsg, Toast.LENGTH_LONG).show();
-        }
-    }
-
-    private void verifyUserInSQLite(String username) {
-        try {
-            android.database.Cursor cursor = dbManager.fetch();
-            if (cursor != null) {
-                int count = cursor.getCount();
-                Log.d(TAG, "Total users in database: " + count);
-
-                if (cursor.moveToFirst()) {
-                    do {
-                        try {
-                            String dbUsername = cursor.getString(1);
-                            Log.d(TAG, "Found user in DB: " + dbUsername);
-                        } catch (Exception e) {
-                            Log.e(TAG, "Error reading user from cursor");
-                        }
-                    } while (cursor.moveToNext());
-                }
-                cursor.close();
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Verification error: " + e.getMessage());
         }
     }
 
