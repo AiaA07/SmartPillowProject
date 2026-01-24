@@ -11,9 +11,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import java.util.Locale;
 
 public class StatsPage extends AppCompatActivity {
@@ -105,9 +103,16 @@ public class StatsPage extends AppCompatActivity {
         long millis = SystemClock.uptimeMillis() - startTime;
         int minutes = (int) (millis / 1000) / 60;
 
-        // TODO: Replace 1 with the actual user ID
+
+        int simulatedQuality = 7;
         long userId = 1;
-        dbManager.updateSleepDuration(userId, minutes);
+
+
+        long sessionId = dbManager.insertSleepSession(userId, minutes, simulatedQuality);
+
+        if (sessionId != -1) {
+            Toast.makeText(this, "Session Saved! Duration: " + minutes + " mins", Toast.LENGTH_LONG).show();
+        }
 
         trackingStatusText.setText("READY TO TRACK");
         sessionTimerText.setVisibility(View.GONE);

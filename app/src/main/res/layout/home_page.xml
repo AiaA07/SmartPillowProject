@@ -7,7 +7,6 @@
     android:background="@android:color/black"
     tools:context=".HomePage">
 
-    <!-- Header Section -->
     <LinearLayout
         android:id="@+id/headerLayout"
         android:layout_width="0dp"
@@ -40,7 +39,6 @@
 
     </LinearLayout>
 
-    <!-- Sleep Goal Section -->
     <LinearLayout
         android:id="@+id/sleepGoalSection"
         android:layout_width="0dp"
@@ -82,9 +80,27 @@
             android:textSize="16sp"
             android:textStyle="bold" />
 
+        <Button
+            android:id="@+id/btnSimulateSleep"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="#BB86FC"
+            android:text="Simulate Session"
+            android:textColor="@android:color/white"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tvDemoResult"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Ready for demo"
+            android:textColor="#AAAAAA"
+            android:textSize="12sp" />
+
     </LinearLayout>
 
-    <!-- Sleep Tips Section -->
     <LinearLayout
         android:id="@+id/sleepTipsSection"
         android:layout_width="0dp"
@@ -92,7 +108,7 @@
         android:orientation="vertical"
         android:gravity="center"
         android:padding="24dp"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sleepGoalSection">
@@ -129,43 +145,8 @@
 
     </LinearLayout>
 
-    <!-- Hidden Input Layout (Keep for compatibility) -->
     <LinearLayout
-        android:id="@+id/GoalInputLayout"
-        android:layout_width="267dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:orientation="horizontal"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/GoalTextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <EditText
-            android:id="@+id/GoalInput"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:backgroundTint="#4CAF50"
-            android:hint="Enter hours (1-12)"
-            android:inputType="number"
-            android:textColor="#FFFFFF"
-            android:textColorHint="#AAAAAA" />
-
-        <Button
-            android:id="@+id/SaveGoalBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:backgroundTint="#4CAF50"
-            android:text="Save"
-            android:textColor="@android:color/white" />
-
-    </LinearLayout>
-
-    <!-- Bottom Navigation - ALL ImageView IDs PRESERVED -->
-    <LinearLayout
-        android:id="@+id/linearLayout"
+        android:id="@+id/bottomNavBar"
         android:layout_width="match_parent"
         android:layout_height="70dp"
         android:background="@android:color/white"
@@ -179,52 +160,23 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
             android:gravity="center"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:contentDescription="Home"
-                android:src="@drawable/home" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Home"
-                android:textColor="@android:color/black"
-                android:textSize="12sp" />
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="true">
+            <ImageView android:layout_width="32dp" android:layout_height="32dp" android:src="@drawable/home" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Home" android:textColor="@android:color/black" android:textSize="12sp" />
         </LinearLayout>
-
 
         <LinearLayout
             android:id="@+id/stats_tab"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
             android:gravity="center"
             android:orientation="vertical">
-
-            <!-- Stats_Btn ID PRESERVED -->
-            <ImageView
-                android:id="@+id/Stats_Btn"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:contentDescription="Stats"
-                android:src="@drawable/stats" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Stats"
-                android:textColor="@android:color/black"
-                android:textSize="12sp" />
+            <ImageView android:id="@+id/Stats_Btn" android:layout_width="32dp" android:layout_height="32dp" android:src="@drawable/stats" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Stats" android:textColor="@android:color/black" android:textSize="12sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -232,26 +184,10 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
             android:gravity="center"
             android:orientation="vertical">
-
-            <!-- Tracking_Btn ID PRESERVED -->
-            <ImageView
-                android:id="@+id/Tracking_Btn"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:contentDescription="Tracking"
-                android:src="@drawable/alarm" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Tracking"
-                android:textColor="@android:color/black"
-                android:textSize="12sp" />
+            <ImageView android:id="@+id/Tracking_Btn" android:layout_width="32dp" android:layout_height="32dp" android:src="@drawable/alarm" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Tracking" android:textColor="@android:color/black" android:textSize="12sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -259,33 +195,11 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
             android:gravity="center"
             android:orientation="vertical">
-
-            <!-- Profile_Btn ID PRESERVED -->
-            <ImageView
-                android:id="@+id/Profile_Btn"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:contentDescription="Profile"
-                android:src="@drawable/profile" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Profile"
-                android:textColor="@android:color/black"
-                android:textSize="12sp" />
+            <ImageView android:id="@+id/Profile_Btn" android:layout_width="32dp" android:layout_height="32dp" android:src="@drawable/profile" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Profile" android:textColor="@android:color/black" android:textSize="12sp" />
         </LinearLayout>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
-
-
-
