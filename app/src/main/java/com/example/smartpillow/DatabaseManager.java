@@ -26,7 +26,8 @@ public class DatabaseManager {
         }
     }
 
-    // UPDATED: Added COLUMN_SLEEP_SCORE to initialization (defaults to 0 or -1)
+    // --- USER MANAGEMENT ---
+
     public void insert(String username, String password, String email, String phone, String gender, int age, int height, int weight, int sleep_duration, int sleep_quality) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseHelper.COLUMN_USERNAME, username);
@@ -40,11 +41,10 @@ public class DatabaseManager {
         contentValues.put(DatabaseHelper.COLUMN_WEIGHT, weight);
         contentValues.put(DatabaseHelper.COLUMN_SLEEP_DURATION, sleep_duration);
         contentValues.put(DatabaseHelper.COLUMN_SLEEP_QUALITY, sleep_quality);
-        contentValues.put(DatabaseHelper.COLUMN_SLEEP_SCORE, 0); // Initialize at 0
+        contentValues.put(DatabaseHelper.COLUMN_SLEEP_SCORE, 0);
         db.insert(DatabaseHelper.TABLE_NAME, null, contentValues);
     }
 
-    // UPDATED: Added COLUMN_SLEEP_SCORE to the query array
     public Cursor fetch() {
         String[] columns = {
                 DatabaseHelper.COLUMN_ID,
@@ -58,7 +58,7 @@ public class DatabaseManager {
                 DatabaseHelper.COLUMN_WEIGHT,
                 DatabaseHelper.COLUMN_SLEEP_DURATION,
                 DatabaseHelper.COLUMN_SLEEP_QUALITY,
-                DatabaseHelper.COLUMN_SLEEP_SCORE // Added for demo
+                DatabaseHelper.COLUMN_SLEEP_SCORE
         };
         Cursor cursor = db.query(DatabaseHelper.TABLE_NAME, columns, null, null, null, null, null);
         if (cursor != null) {
@@ -67,7 +67,6 @@ public class DatabaseManager {
         return cursor;
     }
 
-    // UPDATED: Added score to main update method
     public int update(long id, String username, String password, String email, String phone, String gender, int age, int height, int weight, int sleep_duration, int sleep_quality, int sleep_score) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseHelper.COLUMN_USERNAME, username);
@@ -85,16 +84,6 @@ public class DatabaseManager {
         contentValues.put(DatabaseHelper.COLUMN_SLEEP_QUALITY, sleep_quality);
         contentValues.put(DatabaseHelper.COLUMN_SLEEP_SCORE, sleep_score);
         return db.update(DatabaseHelper.TABLE_NAME, contentValues, DatabaseHelper.COLUMN_ID + "=" + id, null);
-    }
-
-    public int updateSleepDuration(long id, int sleep_duration) {
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(DatabaseHelper.COLUMN_SLEEP_DURATION, sleep_duration);
-        return db.update(DatabaseHelper.TABLE_NAME, contentValues, DatabaseHelper.COLUMN_ID + "=" + id, null);
-    }
-
-    public void delete(long id) {
-        db.delete(DatabaseHelper.TABLE_NAME, DatabaseHelper.COLUMN_ID + "=" + id, null);
     }
 
     public boolean checkPassword(String username, String password) {
@@ -117,29 +106,63 @@ public class DatabaseManager {
         return false;
     }
 
-    // --- ANA: SCORING SYSTEM LOGIC ---
+    // --- ANA: RELATIONAL SESSION MANAGEMENT (NEW) ---
 
-    public int calculateAndSaveSleepScore(long userId, int durationMinutes, int qualityRating) {
-        // 1. The Scoring Algorithm (Weighted Heuristics)
-        double durationScore = (durationMinutes / 480.0) * 100;
-        if (durationScore > 100) durationScore = 100;
+    /**
+     * Records a new sleep session in the 'sleep_sessions' table.
+     * This fulfills the 30% Demo requirement for Data Persistence and Relational Schema.
+     */
+    public long insertSleepSession(long userId, int durationMinutes, int qualityRating) {
+        // 1. Calculate the score using the weighted formula (70/30)
+        int finalScore = calculateScoreLogic(durationMinutes, qualityRating);
 
-        // Calculate final weighted score (70/30 split)
-        int finalScore = (int) ((durationScore * 0.7) + (qualityRating * 10 * 0.3));
-
-        // 2. Prepare Data for Database
+        // 2. Prepare values for the NEW sleep_sessions table
         ContentValues values = new ContentValues();
-        values.put(DatabaseHelper.COLUMN_SLEEP_DURATION, durationMinutes);
-        values.put(DatabaseHelper.COLUMN_SLEEP_QUALITY, qualityRating);
-        values.put(DatabaseHelper.COLUMN_SLEEP_SCORE, finalScore);
+        values.put("user_id", userId); // Link to User Table (Foreign Key)
+        values.put("duration_minutes", durationMinutes);
+        values.put("sleep_quality", qualityRating);
+        values.put("sleep_score", finalScore);
+        // Note: timestamp is added automatically by SQLite
 
-        // 3. Update the record for the specific user
-        int rowsAffected = db.update(DatabaseHelper.TABLE_NAME, values,
-                DatabaseHelper.COLUMN_ID + "=?",
-                new String[]{String.valueOf(userId)});
+        // 3. Insert as a NEW record
+        long sessionId = db.insert("sleep_sessions", null, values);
 
-        Log.d("SleepScoring", "Calculated Score for User " + userId + ": " + finalScore);
+        Log.d("SleepData", "New Session ID " + sessionId + " created for User " + userId);
 
-        return finalScore;
+        // Also update the main user table so the 'latest' score shows on profile
+        updateUserLatestScore(userId, durationMinutes, qualityRating, finalScore);
+
+        return sessionId;
+    }
+
+    /**
+     * Fetches all sessions for a specific user to show history.
+     */
+    public Cursor fetchUserSessions(long userId) {
+        return db.query("sleep_sessions", null, "user_id=?",
+                new String[]{String.valueOf(userId)}, null, null, "timestamp DESC");
+    }
+
+    /**
+     * The 70/30 Weighted Algorithm Logic
+     */
+    private int calculateScoreLogic(int durationMinutes, int qualityRating) {
+        double durationScore = (durationMinutes / 480.0) * 100; // 480 mins = 8 hours
+        if (durationScore > 100) durationScore = 100;
+        return (int) ((durationScore * 0.7) + (qualityRating * 10 * 0.3));
+    }
+
+    private void updateUserLatestScore(long userId, int duration, int quality, int score) {
+        ContentValues values = new ContentValues();
+        values.put(DatabaseHelper.COLUMN_SLEEP_DURATION, duration);
+        values.put(DatabaseHelper.COLUMN_SLEEP_QUALITY, quality);
+        values.put(DatabaseHelper.COLUMN_SLEEP_SCORE, score);
+        db.update(DatabaseHelper.TABLE_NAME, values, DatabaseHelper.COLUMN_ID + "=?", new String[]{String.valueOf(userId)});
+    }
+
+    // --- CLEANUP ---
+
+    public void delete(long id) {
+        db.delete(DatabaseHelper.TABLE_NAME, DatabaseHelper.COLUMN_ID + "=" + id, null);
     }
 }
