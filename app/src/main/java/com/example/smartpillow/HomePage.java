@@ -84,12 +84,28 @@ public class HomePage extends AppCompatActivity {
         btnSimulate.setOnClickListener(v -> {
             localDbManager.open();
             // Simulation: User ID 1, 8 hours, 9/10 Quality
-            long sessionId = localDbManager.insertSleepSession(1, 480, 9);
+            int durationMinutes = 480;
+            int qualityRating = 9;
+            long userId = 1;
+
+            // Calculate sleep score using 70/30 weighted formula
+            double durationScore = (durationMinutes / 480.0) * 100;
+            if (durationScore > 100) durationScore = 100;
+            int sleepScore = (int) ((durationScore * 0.7) + (qualityRating * 10 * 0.3));
+
+            long sessionId = localDbManager.insertSleepSession(userId, durationMinutes, qualityRating);
 
             if (sessionId != -1) {
                 tvDemoResult.setText("✅ Session #" + sessionId + " Saved to SQLite");
                 tvDemoResult.setTextColor(Color.GREEN);
                 Toast.makeText(this, "Data persisted locally!", Toast.LENGTH_SHORT).show();
+
+                // Sync to Firebase if user is logged in
+                if (auth.getCurrentUser() != null) {
+                    String firebaseUid = auth.getCurrentUser().getUid();
+                    localDbManager.syncSingleSessionToFirebase(sessionId, userId, durationMinutes, qualityRating, sleepScore, firebaseUid);
+                    tvDemoResult.setText("✅ Session #" + sessionId + " Saved & Synced to Firebase");
+                }
             } else {
                 tvDemoResult.setText("❌ SQLite Error");
                 tvDemoResult.setTextColor(Color.RED);

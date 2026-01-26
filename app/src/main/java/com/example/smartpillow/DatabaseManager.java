@@ -8,6 +8,16 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import at.favre.lib.crypto.bcrypt.BCrypt;
 
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.firestore.WriteBatch;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class DatabaseManager {
     private final DatabaseHelper dbHelper;
     private SQLiteDatabase db;
@@ -164,5 +174,115 @@ public class DatabaseManager {
 
     public void delete(long id) {
         db.delete(DatabaseHelper.TABLE_NAME, DatabaseHelper.COLUMN_ID + "=" + id, null);
+    }
+
+    // --- FIREBASE SYNC ---
+
+    /**
+     * Sync all sleep sessions for a user to Firebase Firestore.
+     * Uses WriteBatch for efficient batch uploads.
+     */
+    public void syncSleepSessionsToFirebase(long userId, String firebaseUid) {
+        if (firebaseUid == null || firebaseUid.isEmpty()) {
+            Log.w("Sync", "Cannot sync: No Firebase UID provided");
+            return;
+        }
+
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+        Cursor cursor = fetchUserSessions(userId);
+
+        if (cursor == null || cursor.getCount() == 0) {
+            Log.d("Sync", "No sessions to sync for user " + userId);
+            if (cursor != null) cursor.close();
+            return;
+        }
+
+        WriteBatch batch = firestore.batch();
+        CollectionReference sessionsRef = firestore.collection("users")
+                .document(firebaseUid)
+                .collection("sleep_sessions");
+
+        int sessionCount = 0;
+        while (cursor.moveToNext()) {
+            int sessionIdIndex = cursor.getColumnIndex("session_id");
+            int durationIndex = cursor.getColumnIndex("duration_minutes");
+            int qualityIndex = cursor.getColumnIndex("sleep_quality");
+            int scoreIndex = cursor.getColumnIndex("sleep_score");
+            int timestampIndex = cursor.getColumnIndex("timestamp");
+
+            if (sessionIdIndex == -1) continue;
+
+            String sessionId = String.valueOf(cursor.getInt(sessionIdIndex));
+            DocumentReference docRef = sessionsRef.document(sessionId);
+
+            Map<String, Object> sessionData = new HashMap<>();
+            sessionData.put("session_id", cursor.getInt(sessionIdIndex));
+            sessionData.put("user_id", userId);
+            if (durationIndex != -1) sessionData.put("duration_minutes", cursor.getInt(durationIndex));
+            if (qualityIndex != -1) sessionData.put("sleep_quality", cursor.getInt(qualityIndex));
+            if (scoreIndex != -1) sessionData.put("sleep_score", cursor.getInt(scoreIndex));
+            if (timestampIndex != -1) sessionData.put("timestamp", cursor.getString(timestampIndex));
+            sessionData.put("synced_at", FieldValue.serverTimestamp());
+
+            batch.set(docRef, sessionData, SetOptions.merge());
+            sessionCount++;
+        }
+        cursor.close();
+
+        if (sessionCount > 0) {
+            final int finalCount = sessionCount;
+            batch.commit()
+                    .addOnSuccessListener(aVoid -> Log.d("Sync", finalCount + " sessions synced to Firebase"))
+                    .addOnFailureListener(e -> Log.e("Sync", "Batch sync failed: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * Sync a single sleep session to Firebase Firestore.
+     * Called immediately after recording a new session.
+     */
+    public void syncSingleSessionToFirebase(long sessionId, long userId, int durationMinutes, int qualityRating, int sleepScore, String firebaseUid) {
+        if (firebaseUid == null || firebaseUid.isEmpty()) {
+            Log.w("Sync", "Cannot sync session: No Firebase UID provided");
+            return;
+        }
+
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+        DocumentReference docRef = firestore.collection("users")
+                .document(firebaseUid)
+                .collection("sleep_sessions")
+                .document(String.valueOf(sessionId));
+
+        Map<String, Object> sessionData = new HashMap<>();
+        sessionData.put("session_id", sessionId);
+        sessionData.put("user_id", userId);
+        sessionData.put("duration_minutes", durationMinutes);
+        sessionData.put("sleep_quality", qualityRating);
+        sessionData.put("sleep_score", sleepScore);
+        sessionData.put("synced_at", FieldValue.serverTimestamp());
+
+        docRef.set(sessionData, SetOptions.merge())
+                .addOnSuccessListener(aVoid -> Log.d("Sync", "Session " + sessionId + " synced to Firebase"))
+                .addOnFailureListener(e -> Log.e("Sync", "Session sync failed: " + e.getMessage()));
+    }
+
+    /**
+     * Get user ID by username.
+     */
+    public long getUserIdByUsername(String username) {
+        String[] columns = {DatabaseHelper.COLUMN_ID};
+        String selection = DatabaseHelper.COLUMN_USERNAME + " = ?";
+        String[] selectionArgs = {username};
+        Cursor cursor = db.query(DatabaseHelper.TABLE_NAME, columns, selection, selectionArgs, null, null, null);
+
+        long userId = -1;
+        if (cursor != null && cursor.moveToFirst()) {
+            int idIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_ID);
+            if (idIndex != -1) {
+                userId = cursor.getLong(idIndex);
+            }
+            cursor.close();
+        }
+        return userId;
     }
 }
