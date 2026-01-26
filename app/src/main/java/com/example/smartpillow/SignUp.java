@@ -71,6 +71,7 @@ public class SignUp extends AppCompatActivity {
                 Log.d(TAG, "Database has " + count + " users");
                 cursor.close();
             }
+
             // Check table structure
             Log.d(TAG, "Table name: " + DatabaseHelper.TABLE_NAME);
             Log.d(TAG, "Database name: " + DatabaseHelper.DATABASE_NAME);
@@ -204,6 +205,7 @@ public class SignUp extends AppCompatActivity {
             Intent intent = new Intent(SignUp.this, LoginPage.class);
             startActivity(intent);
             finish();
+
         } catch (Exception e) {
             Log.e(TAG, "SQLite save error: " + e.getMessage());
             e.printStackTrace(); // This will show the full stack trace
@@ -281,5 +283,3 @@ public class SignUp extends AppCompatActivity {
         }
     }
 }
-
-
