@@ -1,5 +1,7 @@
 package com.example.smartpillow;
 
+import static androidx.core.content.ContextCompat.startActivity;
+
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -55,7 +57,7 @@ public class HomePage extends AppCompatActivity {
         random = new Random();
 
         initializeViews();
-        setupUserWelcome(); // This will now load name from Firebase
+        setupUserWelcome();
         loadSleepGoalFromFirestore();
         setupTipsRotation();
     }
@@ -68,10 +70,7 @@ public class HomePage extends AppCompatActivity {
         // Navigation
         findViewById(R.id.Stats_Btn).setOnClickListener(v -> startActivity(new Intent(this, StatsPage.class)));
         findViewById(R.id.Tracking_Btn).setOnClickListener(v -> startActivity(new Intent(this, sensor.class)));
-        findViewById(R.id.Profile_Btn).setOnClickListener(v -> {
-            // Start ProfilePage and refresh when returning
-            startActivityForResult(new Intent(this, ProfilePage.class), 1);
-        });
+        findViewById(R.id.Profile_Btn).setOnClickListener(v -> startActivity(new Intent(this, ProfilePage.class)));
 
         // Set Sleep Goal button - now using dialog
         Button setGoalBtn = findViewById(R.id.SetGoalBtn);
@@ -81,59 +80,20 @@ public class HomePage extends AppCompatActivity {
         findViewById(R.id.GoalInputLayout).setVisibility(android.view.View.GONE);
     }
 
-    /**
-     * Load user's display name from Firebase Firestore
-     */
     private void setupUserWelcome() {
-        if (auth.getCurrentUser() != null) {
-            String userId = auth.getCurrentUser().getUid();
-
-            db.collection("users").document(userId)
-                    .get()
-                    .addOnSuccessListener(documentSnapshot -> {
-                        if (documentSnapshot.exists()) {
-                            // Get name from Firestore
-                            String displayName = documentSnapshot.getString("name");
-
-                            if (displayName != null && !displayName.isEmpty()) {
-                                // Use the name from profile
-                                welcome.setText("Welcome, " + displayName + "!");
-                            } else {
-                                // Fallback: use email username
-                                String email = auth.getCurrentUser().getEmail();
-                                if (email != null && email.contains("@")) {
-                                    String username = email.split("@")[0];
-                                    welcome.setText("Welcome, " + username + "!");
-                                } else {
-                                    welcome.setText("Welcome!");
-                                }
-                            }
-                        } else {
-                            // Document doesn't exist yet
-                            String email = auth.getCurrentUser().getEmail();
-                            if (email != null && email.contains("@")) {
-                                String username = email.split("@")[0];
-                                welcome.setText("Welcome, " + username + "!");
-                            } else {
-                                welcome.setText("Welcome!");
-                            }
-                        }
-                    })
-                    .addOnFailureListener(e -> {
-                        // On error, fall back to email
-                        String email = auth.getCurrentUser().getEmail();
-                        if (email != null && email.contains("@")) {
-                            String username = email.split("@")[0];
-                            welcome.setText("Welcome, " + username + "!");
-                        } else {
-                            welcome.setText("Welcome!");
-                        }
-                    });
-        } else {
-            welcome.setText("Welcome!");
-        }
+        String username = getUsernameFromFirebase();
+        welcome.setText(username != null ? "Welcome, " + username + "!" : "Welcome, User!");
     }
 
+    private String getUsernameFromFirebase() {
+        if (auth.getCurrentUser() != null) {
+            String email = auth.getCurrentUser().getEmail();
+            if (email != null && email.contains("@smartpillow.com")) {
+                return email.split("@")[0];
+            }
+        }
+        return null;
+    }
 
     private void showSleepGoalDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -157,9 +117,6 @@ public class HomePage extends AppCompatActivity {
         dialog.show();
     }
 
-    /**
-     * Save sleep goal to Firestore AND also ensure name is saved
-     */
     private void saveSleepGoalToFirestore(String goal) {
         try {
             int hours = Integer.parseInt(goal);
@@ -168,66 +125,34 @@ public class HomePage extends AppCompatActivity {
                 return;
             }
 
-            if (auth.getCurrentUser() == null) return;
-
             String userId = auth.getCurrentUser().getUid();
             DocumentReference userRef = db.collection("users").document(userId);
 
-            // First, get current name to preserve it
-            userRef.get().addOnSuccessListener(documentSnapshot -> {
-                Map<String, Object> userData = new HashMap<>();
+            Map<String, Object> userData = new HashMap<>();
+            userData.put("sleepGoal", goal);
+            userData.put("username", getUsernameFromFirebase());
 
-                // Preserve existing name if it exists
-                if (documentSnapshot.exists()) {
-                    String existingName = documentSnapshot.getString("name");
-                    if (existingName != null && !existingName.isEmpty()) {
-                        userData.put("name", existingName);
-                    }
-                }
-
-                // If no name exists yet, use email username as default
-                if (!userData.containsKey("name")) {
-                    String email = auth.getCurrentUser().getEmail();
-                    if (email != null && email.contains("@")) {
-                        String username = email.split("@")[0];
-                        userData.put("name", username);
-                    }
-                }
-
-                // Add/update sleep goal
-                userData.put("sleepGoal", goal);
-
-                // Save to Firestore
-                userRef.set(userData)
-                        .addOnSuccessListener(aVoid -> {
-                            goalTextView.setText("Current Goal: " + goal + " hours per night");
-
-                            // Update welcome message with current name
-                            if (userData.containsKey("name")) {
-                                welcome.setText("Welcome, " + userData.get("name") + "!");
-                            }
-
-                            Toast.makeText(HomePage.this, "Sleep goal saved!", Toast.LENGTH_SHORT).show();
-                        })
-                        .addOnFailureListener(e -> {
-                            Toast.makeText(HomePage.this, "Failed to save goal", Toast.LENGTH_SHORT).show();
-                        });
-            });
+            userRef.set(userData)
+                    .addOnSuccessListener(aVoid -> {
+                        goalTextView.setText("Current Goal: " + goal + " hours per night");
+                        Toast.makeText(HomePage.this, "Sleep goal saved!", Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(HomePage.this, "Failed to save goal", Toast.LENGTH_SHORT).show();
+                    });
 
         } catch (NumberFormatException e) {
             Toast.makeText(this, "Please enter a valid number", Toast.LENGTH_SHORT).show();
         }
     }
 
-    /**
-     * Load sleep goal from Firestore
-     */
     private void loadSleepGoalFromFirestore() {
         if (auth.getCurrentUser() != null) {
             String userId = auth.getCurrentUser().getUid();
             db.collection("users").document(userId).get()
                     .addOnSuccessListener(documentSnapshot -> {
                         if (documentSnapshot.exists() && documentSnapshot.contains("sleepGoal")) {
+
                             Object goalObj = documentSnapshot.get("sleepGoal");
                             String goalText;
 
@@ -238,6 +163,7 @@ public class HomePage extends AppCompatActivity {
                             }
 
                             goalTextView.setText("Current Goal: " + goalText + " hours per night");
+
                         } else {
                             goalTextView.setText("No sleep goal set");
                         }
@@ -248,30 +174,6 @@ public class HomePage extends AppCompatActivity {
         }
     }
 
-    /**
-     * Refresh data when returning from ProfilePage
-     */
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == 1) { // Code for ProfilePage
-            // Refresh both name and goal when returning from profile
-            setupUserWelcome();
-            loadSleepGoalFromFirestore();
-        }
-    }
-
-    /**
-     * Refresh data when activity resumes (optional, for real-time updates)
-     */
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // Refresh data when user returns to home page
-        setupUserWelcome();
-        loadSleepGoalFromFirestore();
-    }
 
     private void setupTipsRotation() {
         showRandomTip();
