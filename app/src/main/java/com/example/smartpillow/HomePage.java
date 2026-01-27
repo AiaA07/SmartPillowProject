@@ -1,5 +1,7 @@
 package com.example.smartpillow;
 
+import static androidx.core.content.ContextCompat.startActivity;
+
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,7 +9,6 @@ import android.os.Handler;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.graphics.Color;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -21,10 +22,9 @@ import java.util.Random;
 
 public class HomePage extends AppCompatActivity {
 
-    private TextView welcome, goalTextView, tipsTextView, tvDemoResult; // Added tvDemoResult
+    private TextView welcome, goalTextView, tipsTextView;
     private FirebaseAuth auth;
-    private FirebaseFirestore firebaseDb;
-    private DatabaseManager localDbManager; // Added local SQLite manager
+    private FirebaseFirestore db;
     private Handler tipsHandler;
     private Random random;
 
@@ -52,9 +52,7 @@ public class HomePage extends AppCompatActivity {
         setContentView(R.layout.home_page);
 
         auth = FirebaseAuth.getInstance();
-        firebaseDb = FirebaseFirestore.getInstance();
-        localDbManager = new DatabaseManager(this); // Initialize SQLite
-
+        db = FirebaseFirestore.getInstance();
         tipsHandler = new Handler();
         random = new Random();
 
@@ -68,54 +66,19 @@ public class HomePage extends AppCompatActivity {
         welcome = findViewById(R.id.WelcomeText);
         goalTextView = findViewById(R.id.GoalTextView);
         tipsTextView = findViewById(R.id.TipsTextView);
-        tvDemoResult = findViewById(R.id.tvDemoResult); // For demo status
 
         // Navigation
         findViewById(R.id.Stats_Btn).setOnClickListener(v -> startActivity(new Intent(this, StatsPage.class)));
         findViewById(R.id.Tracking_Btn).setOnClickListener(v -> startActivity(new Intent(this, sensor.class)));
         findViewById(R.id.Profile_Btn).setOnClickListener(v -> startActivity(new Intent(this, ProfilePage.class)));
 
-        // Set Sleep Goal button
+        // Set Sleep Goal button - now using dialog
         Button setGoalBtn = findViewById(R.id.SetGoalBtn);
         setGoalBtn.setOnClickListener(v -> showSleepGoalDialog());
 
-        // --- ANA: SIMULATE SESSION BUTTON ---
-        Button btnSimulate = findViewById(R.id.btnSimulateSleep);
-        btnSimulate.setOnClickListener(v -> {
-            localDbManager.open();
-            // Simulation: User ID 1, 8 hours, 9/10 Quality
-            int durationMinutes = 480;
-            int qualityRating = 9;
-            long userId = 1;
-
-            // Calculate sleep score using 70/30 weighted formula
-            double durationScore = (durationMinutes / 480.0) * 100;
-            if (durationScore > 100) durationScore = 100;
-            int sleepScore = (int) ((durationScore * 0.7) + (qualityRating * 10 * 0.3));
-
-            long sessionId = localDbManager.insertSleepSession(userId, durationMinutes, qualityRating);
-
-            if (sessionId != -1) {
-                tvDemoResult.setText("✅ Session #" + sessionId + " Saved to SQLite");
-                tvDemoResult.setTextColor(Color.GREEN);
-                Toast.makeText(this, "Data persisted locally!", Toast.LENGTH_SHORT).show();
-
-                // Sync to Firebase if user is logged in
-                if (auth.getCurrentUser() != null) {
-                    String firebaseUid = auth.getCurrentUser().getUid();
-                    localDbManager.syncSingleSessionToFirebase(sessionId, userId, durationMinutes, qualityRating, sleepScore, firebaseUid);
-                    tvDemoResult.setText("✅ Session #" + sessionId + " Saved & Synced to Firebase");
-                }
-            } else {
-                tvDemoResult.setText("❌ SQLite Error");
-                tvDemoResult.setTextColor(Color.RED);
-            }
-            localDbManager.close();
-        });
-
-
+        // Remove the input layout from view since we're using dialog
+      //  findViewById(R.id.GoalInputLayout).setVisibility(android.view.View.GONE);
     }
-
 
     private void setupUserWelcome() {
         String username = getUsernameFromFirebase();
@@ -163,7 +126,7 @@ public class HomePage extends AppCompatActivity {
             }
 
             String userId = auth.getCurrentUser().getUid();
-            DocumentReference userRef = firebaseDb.collection("users").document(userId);
+            DocumentReference userRef = db.collection("users").document(userId);
 
             Map<String, Object> userData = new HashMap<>();
             userData.put("sleepGoal", goal);
@@ -186,12 +149,21 @@ public class HomePage extends AppCompatActivity {
     private void loadSleepGoalFromFirestore() {
         if (auth.getCurrentUser() != null) {
             String userId = auth.getCurrentUser().getUid();
-            firebaseDb.collection("users").document(userId).get()
+            db.collection("users").document(userId).get()
                     .addOnSuccessListener(documentSnapshot -> {
                         if (documentSnapshot.exists() && documentSnapshot.contains("sleepGoal")) {
+
                             Object goalObj = documentSnapshot.get("sleepGoal");
-                            String goalText = (goalObj != null) ? String.valueOf(goalObj) : "8";
+                            String goalText;
+
+                            if (goalObj != null) {
+                                goalText = String.valueOf(goalObj);  // Convert number or string safely
+                            } else {
+                                goalText = "8"; // default if somehow null
+                            }
+
                             goalTextView.setText("Current Goal: " + goalText + " hours per night");
+
                         } else {
                             goalTextView.setText("No sleep goal set");
                         }
@@ -201,6 +173,7 @@ public class HomePage extends AppCompatActivity {
                     });
         }
     }
+
 
     private void setupTipsRotation() {
         showRandomTip();

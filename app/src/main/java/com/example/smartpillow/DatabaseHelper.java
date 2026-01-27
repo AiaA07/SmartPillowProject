@@ -7,10 +7,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     static final String DATABASE_NAME = "smartpillow.db";
-    static final int DATABASE_VERSION = 2;
+    static final int DATABASE_VERSION = 3; // Updated from 2 to 3
 
     static final String TABLE_NAME = "users";
     static final String COLUMN_ID = "id";
+    static final String COLUMN_NAME = "name"; // Added: User's full name
     static final String COLUMN_USERNAME = "username";
     static final String COLUMN_PASSWORD = "password";
     static final String COLUMN_EMAIL = "email";
@@ -19,7 +20,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     static final String COLUMN_AGE = "age";
     static final String COLUMN_HEIGHT = "height";
     static final String COLUMN_WEIGHT = "weight";
-
     static final String COLUMN_SLEEP_DURATION = "sleep_duration";
     static final String COLUMN_SLEEP_QUALITY = "sleep_quality";
     static final String COLUMN_SLEEP_SCORE = "sleep_score";
@@ -32,8 +32,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     static final String COLUMN_SESSION_SCORE = "sleep_score";
     static final String COLUMN_SESSION_TIMESTAMP = "timestamp";
 
+    // Updated CREATE_USERS_QUERY to include name column
     private static final String CREATE_USERS_QUERY = "CREATE TABLE " + TABLE_NAME + " ("
             + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + COLUMN_NAME + " TEXT, "  // Added name column
             + COLUMN_USERNAME + " TEXT, "
             + COLUMN_PASSWORD + " TEXT, "
             + COLUMN_EMAIL + " TEXT, "
@@ -75,8 +77,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SESSIONS);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
-        onCreate(db);
+        // Handle database upgrades
+        if (oldVersion < 3) {
+            // Add name column to existing users table
+            db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_NAME + " TEXT");
+        }
+        // If you need to handle other upgrades, add more conditions here
     }
 }

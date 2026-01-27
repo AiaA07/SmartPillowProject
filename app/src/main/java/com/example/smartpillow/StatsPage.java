@@ -12,8 +12,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import java.util.Locale;
 
 public class StatsPage extends AppCompatActivity {
@@ -105,25 +103,15 @@ public class StatsPage extends AppCompatActivity {
         long millis = SystemClock.uptimeMillis() - startTime;
         int minutes = (int) (millis / 1000) / 60;
 
+
         int simulatedQuality = 7;
         long userId = 1;
 
-        // Calculate sleep score using the 70/30 weighted formula
-        double durationScore = (minutes / 480.0) * 100;
-        if (durationScore > 100) durationScore = 100;
-        int sleepScore = (int) ((durationScore * 0.7) + (simulatedQuality * 10 * 0.3));
 
         long sessionId = dbManager.insertSleepSession(userId, minutes, simulatedQuality);
 
         if (sessionId != -1) {
             Toast.makeText(this, "Session Saved! Duration: " + minutes + " mins", Toast.LENGTH_LONG).show();
-
-            // Sync to Firebase if user is logged in
-            FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-            if (firebaseUser != null) {
-                String firebaseUid = firebaseUser.getUid();
-                dbManager.syncSingleSessionToFirebase(sessionId, userId, minutes, simulatedQuality, sleepScore, firebaseUid);
-            }
         }
 
         trackingStatusText.setText("READY TO TRACK");

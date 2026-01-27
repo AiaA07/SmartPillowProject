@@ -87,7 +87,7 @@ public class LoginPage extends AppCompatActivity {
                         // Step 3: Sync sleep sessions to Firebase
                         long localUserId = dbManager.getUserIdByUsername(username);
                         if (localUserId != -1) {
-                            dbManager.syncSleepSessionsToFirebase(localUserId, userId);
+                           dbManager.syncSleepSessionsToFirebase(localUserId, userId);
                         }
 
                         // Step 4: Proceed to home page

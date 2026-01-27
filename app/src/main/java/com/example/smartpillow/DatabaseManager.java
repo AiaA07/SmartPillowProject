@@ -38,8 +38,20 @@ public class DatabaseManager {
 
     // --- USER MANAGEMENT ---
 
-    public void insert(String username, String password, String email, String phone, String gender, int age, int height, int weight, int sleep_duration, int sleep_quality) {
+    // Updated insert method without name (for initial signup)
+    public long insert(String username, String password, String email, String phone,
+                       String gender, int age, int height, int weight,
+                       int sleep_duration, int sleep_quality) {
+        return insert("", username, password, email, phone, gender, age,
+                height, weight, sleep_duration, sleep_quality);
+    }
+
+    // New insert method with name parameter
+    public long insert(String name, String username, String password, String email,
+                       String phone, String gender, int age, int height, int weight,
+                       int sleep_duration, int sleep_quality) {
         ContentValues contentValues = new ContentValues();
+        contentValues.put(DatabaseHelper.COLUMN_NAME, name);
         contentValues.put(DatabaseHelper.COLUMN_USERNAME, username);
         String hashedPassword = BCrypt.withDefaults().hashToString(12, password.toCharArray());
         contentValues.put(DatabaseHelper.COLUMN_PASSWORD, hashedPassword);
@@ -52,12 +64,13 @@ public class DatabaseManager {
         contentValues.put(DatabaseHelper.COLUMN_SLEEP_DURATION, sleep_duration);
         contentValues.put(DatabaseHelper.COLUMN_SLEEP_QUALITY, sleep_quality);
         contentValues.put(DatabaseHelper.COLUMN_SLEEP_SCORE, 0);
-        db.insert(DatabaseHelper.TABLE_NAME, null, contentValues);
+        return db.insert(DatabaseHelper.TABLE_NAME, null, contentValues);
     }
 
     public Cursor fetch() {
         String[] columns = {
                 DatabaseHelper.COLUMN_ID,
+                DatabaseHelper.COLUMN_NAME,       // Added name
                 DatabaseHelper.COLUMN_USERNAME,
                 DatabaseHelper.COLUMN_PASSWORD,
                 DatabaseHelper.COLUMN_EMAIL,
@@ -77,8 +90,12 @@ public class DatabaseManager {
         return cursor;
     }
 
-    public int update(long id, String username, String password, String email, String phone, String gender, int age, int height, int weight, int sleep_duration, int sleep_quality, int sleep_score) {
+    // Updated update method with name parameter
+    public int update(long id, String name, String username, String password,
+                      String email, String phone, String gender, int age, int height,
+                      int weight, int sleep_duration, int sleep_quality, int sleep_score) {
         ContentValues contentValues = new ContentValues();
+        contentValues.put(DatabaseHelper.COLUMN_NAME, name);
         contentValues.put(DatabaseHelper.COLUMN_USERNAME, username);
         if (password != null && !password.isEmpty()) {
             String hashedPassword = BCrypt.withDefaults().hashToString(12, password.toCharArray());
@@ -93,7 +110,24 @@ public class DatabaseManager {
         contentValues.put(DatabaseHelper.COLUMN_SLEEP_DURATION, sleep_duration);
         contentValues.put(DatabaseHelper.COLUMN_SLEEP_QUALITY, sleep_quality);
         contentValues.put(DatabaseHelper.COLUMN_SLEEP_SCORE, sleep_score);
-        return db.update(DatabaseHelper.TABLE_NAME, contentValues, DatabaseHelper.COLUMN_ID + "=" + id, null);
+        return db.update(DatabaseHelper.TABLE_NAME, contentValues,
+                DatabaseHelper.COLUMN_ID + "=" + id, null);
+    }
+
+    // New method to update user profile information only
+    public int updateUserProfile(String username, String name, String gender,
+                                 int age, int height, int weight) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(DatabaseHelper.COLUMN_NAME, name);
+        contentValues.put(DatabaseHelper.COLUMN_GENDER, gender);
+        contentValues.put(DatabaseHelper.COLUMN_AGE, age);
+        contentValues.put(DatabaseHelper.COLUMN_HEIGHT, height);
+        contentValues.put(DatabaseHelper.COLUMN_WEIGHT, weight);
+
+        String whereClause = DatabaseHelper.COLUMN_USERNAME + " = ?";
+        String[] whereArgs = {username};
+
+        return db.update(DatabaseHelper.TABLE_NAME, contentValues, whereClause, whereArgs);
     }
 
     public boolean checkPassword(String username, String password) {
@@ -152,6 +186,7 @@ public class DatabaseManager {
         return db.query("sleep_sessions", null, "user_id=?",
                 new String[]{String.valueOf(userId)}, null, null, "timestamp DESC");
     }
+
     /**
      * Fetches the most recent session for the report.
      * Proves we can retrieve and display calculated data from SQLite.
@@ -160,6 +195,7 @@ public class DatabaseManager {
         return db.query("sleep_sessions", null, "user_id=?",
                 new String[]{String.valueOf(userId)}, null, null, "timestamp DESC", "1");
     }
+
     /**
      * The 70/30 Weighted Algorithm Logic
      */
@@ -291,5 +327,14 @@ public class DatabaseManager {
             cursor.close();
         }
         return userId;
+    }
+
+    /**
+     * Get user data by username
+     */
+    public Cursor getUserByUsername(String username) {
+        String selection = DatabaseHelper.COLUMN_USERNAME + " = ?";
+        String[] selectionArgs = {username};
+        return db.query(DatabaseHelper.TABLE_NAME, null, selection, selectionArgs, null, null, null);
     }
 }

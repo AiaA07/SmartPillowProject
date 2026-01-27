@@ -48,6 +48,7 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-analytics")
+    implementation("at.favre.lib:bcrypt:0.10.2")
 
 
     implementation(libs.appcompat)
@@ -57,7 +58,6 @@ dependencies {
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
     implementation(libs.annotations)
-    implementation("at.favre.lib:bcrypt:0.9.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
