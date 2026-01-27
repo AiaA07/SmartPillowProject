@@ -152,7 +152,14 @@ public class DatabaseManager {
         return db.query("sleep_sessions", null, "user_id=?",
                 new String[]{String.valueOf(userId)}, null, null, "timestamp DESC");
     }
-
+    /**
+     * Fetches the most recent session for the report.
+     * Proves we can retrieve and display calculated data from SQLite.
+     */
+    public Cursor fetchLatestSession(long userId) {
+        return db.query("sleep_sessions", null, "user_id=?",
+                new String[]{String.valueOf(userId)}, null, null, "timestamp DESC", "1");
+    }
     /**
      * The 70/30 Weighted Algorithm Logic
      */
