@@ -84,7 +84,13 @@ public class LoginPage extends AppCompatActivity {
                         // Step 2: Sync any local changes to Firebase
                         syncLocalDataToFirebase(userId);
 
-                        // Step 3: Proceed to home page
+                        // Step 3: Sync sleep sessions to Firebase
+                        long localUserId = dbManager.getUserIdByUsername(username);
+                        if (localUserId != -1) {
+                            dbManager.syncSleepSessionsToFirebase(localUserId, userId);
+                        }
+
+                        // Step 4: Proceed to home page
                         completeLogin(username);
 
                     } else {
@@ -118,21 +124,8 @@ public class LoginPage extends AppCompatActivity {
 
     private boolean validateUserInSQLite(String username, String password) {
         try {
-            android.database.Cursor cursor = dbManager.fetch();
-
-            if (cursor != null && cursor.moveToFirst()) {
-                do {
-                    String dbUsername = cursor.getString(1); // COLUMN_USERNAME at index 1
-                    String dbPassword = cursor.getString(2); // COLUMN_PASSWORD at index 2
-
-                    if (dbUsername.equals(username) && dbPassword.equals(password)) {
-                        cursor.close();
-                        return true;
-                    }
-                } while (cursor.moveToNext());
-                cursor.close();
-            }
-            return false;
+            // Use BCrypt verification instead of direct string comparison
+            return dbManager.checkPassword(username, password);
         } catch (Exception e) {
             Log.e("Login", "SQLite validation error: " + e.getMessage());
             return false;
