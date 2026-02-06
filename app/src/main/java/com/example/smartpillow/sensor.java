@@ -65,45 +65,37 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
             );
         }
     }
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if (event.sensor.getType() != Sensor.TYPE_ACCELEROMETER) return;
 
+        long currentTime = System.currentTimeMillis();
+        float x = event.values[0];
+        float y = event.values[1];
+        float z = event.values[2];
+
+        // 1. Update the UI (Keep your existing logic)
+        tvX.setText("X: " + x);
+        tvY.setText("Y: " + y);
+        tvZ.setText("Z: " + z);
+
+        //
+        //
+        // Format: TIMESTAMP, X, Y, Z
+        Log.i("RAW_DATA_EXPORT", currentTime + "," + x + "," + y + "," + z);
+
+        // 3. Your "Sleep Metric" logic
+        if (x >= -10 && x <= 10) {
+            // Normal state logic
+        }
+    }
     @Override
     protected void onPause() {
         super.onPause();
         sensorManager.unregisterListener(this);
     }
 
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() != Sensor.TYPE_ACCELEROMETER) return;
 
-        long currentTime = System.currentTimeMillis();
-
-        float x = event.values[0];
-        float y = event.values[1];
-        float z = event.values[2];
-
-        // Update UI
-        tvX.setText("X: " + x);
-        tvY.setText("Y: " + y);
-        tvZ.setText("Z: " + z);
-
-        //Sleep metric implementation
-        float minX = -10;
-        float maxX = 10;
-
-        if(x >= minX && x <= maxX)
-            tvX.setText("X: " + x + " (Normal)");
-        else
-            tvX.setText("X: " + x + " (Abnormal)");
-
-
-        // Optional throttling if you plan future logic
-        if ((currentTime - lastUpdate) >= UPDATE_INTERVAL_MS) {
-            lastUpdate = currentTime;
-
-            Log.d(TAG, "Accelerometer: X=" + x + " Y=" + y + " Z=" + z);
-        }
-    }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
