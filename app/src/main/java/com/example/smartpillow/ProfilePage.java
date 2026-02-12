@@ -144,9 +144,8 @@ public class ProfilePage extends AppCompatActivity {
     }
 
 
-
     @Override
-    protected void onDestroy () {
+    protected void onDestroy() {
         super.onDestroy();
         if (dbManager != null) {
             dbManager.close();

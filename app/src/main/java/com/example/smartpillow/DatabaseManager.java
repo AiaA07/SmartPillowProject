@@ -149,8 +149,45 @@ public class DatabaseManager {
         }
         return false;
     }
+    // --- SENSOR SIGNAL PIPELINE (FOR SADEH ALGORITHM) ---
 
-    // --- ANA: RELATIONAL SESSION MANAGEMENT (NEW) ---
+    /**
+     * Saves raw magnitude from Accelerometer or Gyroscope.
+     * This is the "Staging Area" for the Signal Pipeline.
+     */
+    public void saveRawSensorData(long sessionId, int sensorType, double magnitude) {
+        ContentValues values = new ContentValues();
+        values.put(DatabaseHelper.COLUMN_RAW_SESSION_ID, sessionId);
+        values.put(DatabaseHelper.COLUMN_RAW_TIMESTAMP, System.currentTimeMillis());
+        values.put(DatabaseHelper.COLUMN_RAW_TYPE, sensorType); // 1 = Accel, 2 = Gyro
+        values.put(DatabaseHelper.COLUMN_RAW_MAGNITUDE, magnitude);
+
+        // We use insert (not replace) because we want every single vibration point
+        db.insert(DatabaseHelper.TABLE_RAW_DATA, null, values);
+    }
+
+    /**
+     * Clears raw data for a specific session after post-processing is done.
+     * Good for keeping the DB size manageable after the Sadeh math is finished.
+     */
+    public void clearRawDataForSession(long sessionId) {
+        db.delete(DatabaseHelper.TABLE_RAW_DATA,
+                DatabaseHelper.COLUMN_RAW_SESSION_ID + "=?",
+                new String[]{String.valueOf(sessionId)});
+    }
+
+    /**
+     * Fetches raw data for post-processing (The Butterworth Filter input).
+     */
+    public Cursor fetchRawDataForSession(long sessionId) {
+        return db.query(DatabaseHelper.TABLE_RAW_DATA,
+                null,
+                DatabaseHelper.COLUMN_RAW_SESSION_ID + "=?",
+                new String[]{String.valueOf(sessionId)},
+                null, null, DatabaseHelper.COLUMN_RAW_TIMESTAMP + " ASC");
+    }
+
+    //
 
     /**
      * Records a new sleep session in the 'sleep_sessions' table.
@@ -308,6 +345,54 @@ public class DatabaseManager {
                 .addOnSuccessListener(aVoid -> Log.d("Sync", "Session " + sessionId + " synced to Firebase"))
                 .addOnFailureListener(e -> Log.e("Sync", "Session sync failed: " + e.getMessage()));
     }
+
+    //delete this later
+    /**
+     * SIMULATION TOOL: Generates 1 minute of fake sensor data.
+     * Useful for testing the pipeline without physical hardware.
+     */
+    public void simulateSleepData(long sessionId) {
+        db.beginTransaction();
+        try {
+            // Simulate 60 seconds of data at 10Hz (600 data points)
+            for (int i = 0; i < 600; i++) {
+                long fakeTimestamp = System.currentTimeMillis() + (i * 100);
+
+                // Generate "Wheat": A subtle 0.2Hz sine wave (breathing)
+                double breathing = 0.5 * Math.sin(2 * Math.PI * 0.2 * (i / 10.0));
+
+                // Generate "Chaff": Random mattress noise
+                double noise = (Math.random() - 0.5) * 0.2;
+
+                double totalMagnitude = Math.abs(breathing + noise);
+
+                ContentValues values = new ContentValues();
+                values.put(DatabaseHelper.COLUMN_RAW_SESSION_ID, sessionId);
+                values.put(DatabaseHelper.COLUMN_RAW_TIMESTAMP, fakeTimestamp);
+                values.put(DatabaseHelper.COLUMN_RAW_TYPE, 1); // Accel
+                values.put(DatabaseHelper.COLUMN_RAW_MAGNITUDE, totalMagnitude);
+
+                db.insert(DatabaseHelper.TABLE_RAW_DATA, null, values);
+            }
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+        Log.d("SIMULATION", "Generated 600 points of fake sleep data for Session " + sessionId);
+    }
+    //delete
+
+    /**
+     * Deletes all raw sensor points for a session to save space.
+     * Should be called AFTER the Sadeh algorithm has finished processing.
+     */
+    public void deleteRawDataForSession(long sessionId) {
+        db.delete(DatabaseHelper.TABLE_RAW_DATA,
+                DatabaseHelper.COLUMN_RAW_SESSION_ID + "=?",
+                new String[]{String.valueOf(sessionId)});
+        Log.d("Cleanup", "Deleted raw data for Session: " + sessionId);
+    }
+
 
     /**
      * Get user ID by username.
