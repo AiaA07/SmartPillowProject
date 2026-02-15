@@ -89,6 +89,13 @@
             android:text="Z:"
             android:textColor="#FFFFFF" />
 
+        <TextView
+            android:id="@+id/tvHeartRate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Heart rate:"
+            android:textColor="#FFFFFF" />
+
     </LinearLayout>
 
 
