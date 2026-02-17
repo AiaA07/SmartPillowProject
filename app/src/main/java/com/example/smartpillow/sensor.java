@@ -128,49 +128,46 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() != Sensor.TYPE_ACCELEROMETER) return;
-
-        long currentTime = System.currentTimeMillis();
-
-        float x = event.values[0];
-        float y = event.values[1];
-        float z = event.values[2];
-
-        // Update UI
-        tvX.setText("X: " + x);
-        tvY.setText("Y: " + y);
-        tvZ.setText("Z: " + z);
-
-        //Sleep metric implementation
-        float minX = -10;
-        float maxX = 10;
-
-        if(x >= minX && x <= maxX)
-            tvX.setText("X: " + x + " (Normal)");
-        else
-            tvX.setText("X: " + x + " (Abnormal)");
 
 
-        // Optional throttling if you plan future logic
-        if ((currentTime - lastUpdate) >= UPDATE_INTERVAL_MS) {
-            lastUpdate = currentTime;
+        Log.d(TAG, "onSensorChanged: type=" + event.sensor.getType());
+        // Handle accelerometer
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            long currentTime = System.currentTimeMillis();
 
-            Log.d(TAG, "Accelerometer: X=" + x + " Y=" + y + " Z=" + z);
+            float x = event.values[0];
+            float y = event.values[1];
+            float z = event.values[2];
+
+            // Update UI
+            tvX.setText("X: " + x);
+            tvY.setText("Y: " + y);
+            tvZ.setText("Z: " + z);
+
+            // Sleep metric implementation
+            float minX = -10;
+            float maxX = 10;
+            if (x >= minX && x <= maxX)
+                tvX.setText("X: " + x + " (Normal)");
+            else
+                tvX.setText("X: " + x + " (Abnormal)");
+
+            // Optional throttling
+            if ((currentTime - lastUpdate) >= UPDATE_INTERVAL_MS) {
+                lastUpdate = currentTime;
+                Log.d(TAG, "Accelerometer: X=" + x + " Y=" + y + " Z=" + z);
+            }
         }
-
-
-    // Added (for ppg)
+        // Handle heart rate
         else if (event.sensor.getType() == Sensor.TYPE_HEART_RATE) {
-        float heartRate = event.values[0];
-        int accuracy = event.accuracy;
+            float heartRate = event.values[0];
+            int accuracy = event.accuracy;
 
-        // Update UI
-        tvHeartRate.setText("Heart Rate: " + heartRate + " bpm");
-        Log.d(TAG, "Heart rate: " + heartRate + " bpm (accuracy=" + accuracy + ")");
-
-        // Optionally: you can store this value or pass it to another activity
+            // Update UI
+            tvHeartRate.setText("Heart Rate: " + heartRate + " bpm");
+            Log.d(TAG, "Heart rate: " + heartRate + " bpm (accuracy=" + accuracy + ")");
+        }
     }
-}
 
 
     @Override

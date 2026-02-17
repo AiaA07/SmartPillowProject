@@ -49,6 +49,7 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-analytics")
     implementation("at.favre.lib:bcrypt:0.10.2")
+    implementation("androidx.wear:wear:1.3.0")
 
 
     implementation(libs.appcompat)

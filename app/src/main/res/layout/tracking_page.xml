@@ -8,11 +8,6 @@
     android:background="@android:color/black">
 
     <!-- Main Tracking Content -->
-
-
-
-
-    <!-- Bottom Navigation -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -21,24 +16,19 @@
         android:padding="32dp"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0">
+        app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Tracking Icon/Status -->
-
-        <!-- Start Tracking Button -->
+        <!-- Tracking Status -->
         <TextView
-            android:id="@+id/tracking_status_text"
+            android:id="@+id/tvHeartRate"
             android:layout_width="match_parent"
-            android:layout_height="51dp"
-            android:layout_marginBottom="40dp"
+            android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="READY TO TRACK"
-            android:textColor="#4CAF50"
-            android:textSize="28sp"
-            android:textStyle="bold" />
+            android:text="Heart rate:"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#FFFFFF"
+            android:textSize="14sp" />
 
         <!-- Stop Tracking Button -->
         <Button
@@ -65,42 +55,39 @@
             android:textStyle="bold"
             android:visibility="gone" />
 
-
-        <!-- Instructions -->
-
+        <!-- Sensor Data – adjusted for watch visibility -->
         <TextView
             android:id="@+id/TexttvX"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="X:"
-            android:textColor="#FFFFFF" />
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:gravity="center" />
 
         <TextView
             android:id="@+id/TexttvY"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Y:"
-            android:textColor="#FFFFFF" />
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:gravity="center" />
 
         <TextView
             android:id="@+id/TexttvZ"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Z:"
-            android:textColor="#FFFFFF" />
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:gravity="center" />
 
-        <TextView
-            android:id="@+id/tvHeartRate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Heart rate:"
-            android:textColor="#FFFFFF" />
+
 
     </LinearLayout>
 
-
-
-
+    <!-- Bottom Navigation -->
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
@@ -111,6 +98,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
+        <!-- Home Tab -->
         <LinearLayout
             android:id="@+id/home_tab"
             android:layout_width="0dp"
@@ -137,6 +125,7 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
+        <!-- Stats Tab -->
         <LinearLayout
             android:id="@+id/stats_tab"
             android:layout_width="0dp"
@@ -163,6 +152,7 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
+        <!-- Tracking Tab -->
         <LinearLayout
             android:id="@+id/tracking_tab"
             android:layout_width="0dp"
@@ -179,7 +169,7 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:contentDescription="Tracking"
-                android:src="@drawable/alarm" />  <!-- Using alarm icon for now -->
+                android:src="@drawable/alarm" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -189,6 +179,7 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
+        <!-- Profile Tab -->
         <LinearLayout
             android:id="@+id/profile_tab"
             android:layout_width="0dp"
@@ -215,10 +206,5 @@
                 android:textSize="12sp" />
         </LinearLayout>
     </LinearLayout>
-
-
-
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

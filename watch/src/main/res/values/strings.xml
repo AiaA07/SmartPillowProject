@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">Watch</string>
-    <String color="Black">Color</String>
+    <color name="Black">#000000</color>
 </resources>

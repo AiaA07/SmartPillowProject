@@ -26,3 +26,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "SmartPillow"
 include(":app", ":watch")
+include(":watch2")
+include(":shared")
