@@ -1,4 +1,4 @@
-package com.example.smartpillow;
+/*package com.example.smartpillow;
 
 import android.database.Cursor;
 import android.os.Bundle;
@@ -13,10 +13,10 @@ public class ReportActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_report);
+      //  setContentView(R.layout.activity_report);
 
-        tvSleepState = findViewById(R.id.tvSleepState);
-        tvActivityScore = findViewById(R.id.tvActivityScore);
+       // tvSleepState = findViewById(R.id.tvSleepState);
+      //  tvActivityScore = findViewById(R.id.tvActivityScore);
 
         dbManager = new DatabaseManager(this);
         dbManager.open();
@@ -45,3 +45,5 @@ public class ReportActivity extends AppCompatActivity {
         }
     }
 }
+
+ */
