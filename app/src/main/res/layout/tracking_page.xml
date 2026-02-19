@@ -83,7 +83,33 @@
             android:textSize="14sp"
             android:gravity="center" />
 
+        <!-- Gyroscope Data -->
+        <TextView
+            android:id="@+id/tvGyroX"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Gyro X:"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:gravity="center" />
 
+        <TextView
+            android:id="@+id/tvGyroY"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Gyro Y:"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/tvGyroZ"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Gyro Z:"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:gravity="center" />
 
     </LinearLayout>
 

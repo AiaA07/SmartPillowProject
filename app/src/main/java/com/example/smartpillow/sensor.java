@@ -35,6 +35,7 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
     private Sensor accelerometer;
 
     private Sensor heartRateSensor; //Added(for ppg)
+    private Sensor gyroscope; //Added(for gyroscope)
 
     private long lastUpdate = 0L;
     private static final long UPDATE_INTERVAL_MS = 200L;
@@ -43,6 +44,9 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
     private TextView tvY;
     private TextView tvZ;
     private TextView tvHeartRate; //Added(for ppg)
+    private TextView tvGyroX; //Added(for gyroscope)
+    private TextView tvGyroY; //Added(for gyroscope)
+    private TextView tvGyroZ; //Added(for gyroscope)
 
     private static final int PERMISSION_REQUEST_BODY_SENSORS = 100; //Added(for ppg)
 
@@ -64,12 +68,16 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
         tvY = findViewById(R.id.TexttvY);
         tvZ = findViewById(R.id.TexttvZ);
         tvHeartRate = findViewById(R.id.tvHeartRate); //Added(for ppg)
+        tvGyroX = findViewById(R.id.tvGyroX); //Added(for gyroscope)
+        tvGyroY = findViewById(R.id.tvGyroY); //Added(for gyroscope)
+        tvGyroZ = findViewById(R.id.tvGyroZ); //Added(for gyroscope)
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
         if (sensorManager != null) {
             accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
             heartRateSensor = sensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
+            gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE); //Added(for gyroscope)
         }
 
         //Added(for ppg)
@@ -82,6 +90,14 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
         if (heartRateSensor == null) {                     // ADDED
             Log.w(TAG, "No heart rate sensor found on this device.");
             tvHeartRate.setText("Heart Rate: not available");
+        }
+
+        //Added(for gyroscope)
+        if (gyroscope == null) {
+            Log.w(TAG, "No gyroscope sensor found on this device.");
+            tvGyroX.setText("Gyro X: not available");
+            tvGyroY.setText("Gyro Y: not available");
+            tvGyroZ.setText("Gyro Z: not available");
         }
 
         //Added(for ppg)
@@ -118,6 +134,9 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
         if (heartRateSensor != null) {
             sensorManager.registerListener(this, heartRateSensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
+        if (gyroscope != null) { //Added(for gyroscope)
+            sensorManager.registerListener(this, gyroscope, SensorManager.SENSOR_DELAY_NORMAL);
+        }
     }
 
     @Override
@@ -130,6 +149,9 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
         if (heartRateSensor != null &&
                 ContextCompat.checkSelfPermission(this, Manifest.permission.BODY_SENSORS) == PackageManager.PERMISSION_GRANTED) {
             sensorManager.registerListener(this, heartRateSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+        if (gyroscope != null) { //Added(for gyroscope)
+            sensorManager.registerListener(this, gyroscope, SensorManager.SENSOR_DELAY_NORMAL);
         }
     }
 
@@ -180,12 +202,23 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
             tvHeartRate.setText("Heart Rate: " + heartRate + " bpm");
             Log.d(TAG, "Heart rate: " + heartRate + " bpm (accuracy=" + accuracy + ")");
 
-        // Add to collector if plausible and accuracy acceptable
-        if (heartRate > 30 && heartRate < 200 && accuracy >= SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM) {
-            HeartRateCollector.getInstance().addHeartRate(heartRate);
+            // Add to collector if plausible and accuracy acceptable
+            if (heartRate > 30 && heartRate < 200 && accuracy >= SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM) {
+                HeartRateCollector.getInstance().addHeartRate(heartRate);
+            }
+
+
         }
+        // Handle gyroscope //Added(for gyroscope)
+        else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
+            float gyroX = event.values[0];
+            float gyroY = event.values[1];
+            float gyroZ = event.values[2];
 
-
+            tvGyroX.setText("Gyro X: " + gyroX + " rad/s");
+            tvGyroY.setText("Gyro Y: " + gyroY + " rad/s");
+            tvGyroZ.setText("Gyro Z: " + gyroZ + " rad/s");
+            Log.d(TAG, "Gyroscope: X=" + gyroX + " Y=" + gyroY + " Z=" + gyroZ);
         }
     }
 
