@@ -34,14 +34,9 @@
 
         <activity
             android:name=".sensor"
-            android:exported="true"
-            android:taskAffinity="" >
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
+            android:exported="false"
+            android:taskAffinity="" />
 
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
-        </activity>
         <activity
             android:name=".StatsPage"
             android:exported="false"
@@ -50,7 +45,13 @@
         <activity
             android:name=".LoginPage"
             android:exported="true"
-            android:taskAffinity="" />
+            android:taskAffinity="" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
         <activity
             android:name=".HomePage"

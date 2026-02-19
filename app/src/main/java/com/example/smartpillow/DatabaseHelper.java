@@ -7,8 +7,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Version 4: Added raw_sensor_data table for Sadeh Algorithm
+    // Version 5: Added avg_heart_rate to sleep_sessions
     static final String DATABASE_NAME = "smartpillow.db";
-    static final int DATABASE_VERSION = 4;
+    static final int DATABASE_VERSION = 5;
 
     // USERS TABLE
     static final String TABLE_NAME = "users";
@@ -33,6 +34,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     static final String COLUMN_SESSION_DURATION = "duration_minutes";
     static final String COLUMN_SESSION_QUALITY = "sleep_quality";
     static final String COLUMN_SESSION_SCORE = "sleep_score";
+
+    static final String COLUMN_SESSION_AVG_HEART_RATE = "avg_heart_rate";
+
     static final String COLUMN_SESSION_TIMESTAMP = "timestamp";
 
     // NEW: RAW SENSOR DATA TABLE (The Pipeline Staging Area)
@@ -65,6 +69,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + COLUMN_SESSION_DURATION + " INTEGER, "
             + COLUMN_SESSION_QUALITY + " INTEGER, "
             + COLUMN_SESSION_SCORE + " INTEGER, "
+            + COLUMN_SESSION_AVG_HEART_RATE + " REAL, "
             + COLUMN_SESSION_TIMESTAMP + " DATETIME DEFAULT CURRENT_TIMESTAMP, "
             + "FOREIGN KEY (" + COLUMN_SESSION_USER_ID + ") REFERENCES " + TABLE_NAME + "(" + COLUMN_ID + ") ON DELETE CASCADE)";
 
@@ -104,6 +109,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (oldVersion < 4) {
             // Adds the raw data table for users who already had the app installed
             db.execSQL(CREATE_RAW_DATA_QUERY);
+        } if (oldVersion < 5) {
+            db.execSQL("ALTER TABLE " + TABLE_SESSIONS + " ADD COLUMN " + COLUMN_SESSION_AVG_HEART_RATE + " REAL");
         }
     }
 }

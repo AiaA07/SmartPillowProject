@@ -193,7 +193,7 @@ public class DatabaseManager {
      * Records a new sleep session in the 'sleep_sessions' table.
      * This fulfills the 30% Demo requirement for Data Persistence and Relational Schema.
      */
-    public long insertSleepSession(long userId, int durationMinutes, int qualityRating) {
+    public long insertSleepSession(long userId, int durationMinutes, int qualityRating,  float avgHeartRate) {
         // 1. Calculate the score using the weighted formula (70/30)
         int finalScore = calculateScoreLogic(durationMinutes, qualityRating);
 
@@ -203,12 +203,13 @@ public class DatabaseManager {
         values.put("duration_minutes", durationMinutes);
         values.put("sleep_quality", qualityRating);
         values.put("sleep_score", finalScore);
+        values.put("avg_heart_rate", avgHeartRate); // new column
         // Note: timestamp is added automatically by SQLite
 
         // 3. Insert as a NEW record
         long sessionId = db.insert("sleep_sessions", null, values);
 
-        Log.d("SleepData", "New Session ID " + sessionId + " created for User " + userId);
+        Log.d("SleepData", "New Session ID " + sessionId + " created for User " + userId + " with avg heart rate " + avgHeartRate);
 
         // Also update the main user table so the 'latest' score shows on profile
         updateUserLatestScore(userId, durationMinutes, qualityRating, finalScore);
@@ -288,6 +289,7 @@ public class DatabaseManager {
             int durationIndex = cursor.getColumnIndex("duration_minutes");
             int qualityIndex = cursor.getColumnIndex("sleep_quality");
             int scoreIndex = cursor.getColumnIndex("sleep_score");
+            int hrIndex = cursor.getColumnIndex("avg_heart_rate");
             int timestampIndex = cursor.getColumnIndex("timestamp");
 
             if (sessionIdIndex == -1) continue;
@@ -301,6 +303,7 @@ public class DatabaseManager {
             if (durationIndex != -1) sessionData.put("duration_minutes", cursor.getInt(durationIndex));
             if (qualityIndex != -1) sessionData.put("sleep_quality", cursor.getInt(qualityIndex));
             if (scoreIndex != -1) sessionData.put("sleep_score", cursor.getInt(scoreIndex));
+            if (hrIndex != -1) sessionData.put("avg_heart_rate", cursor.getFloat(hrIndex));
             if (timestampIndex != -1) sessionData.put("timestamp", cursor.getString(timestampIndex));
             sessionData.put("synced_at", FieldValue.serverTimestamp());
 
@@ -321,7 +324,7 @@ public class DatabaseManager {
      * Sync a single sleep session to Firebase Firestore.
      * Called immediately after recording a new session.
      */
-    public void syncSingleSessionToFirebase(long sessionId, long userId, int durationMinutes, int qualityRating, int sleepScore, String firebaseUid) {
+    public void syncSingleSessionToFirebase(long sessionId, long userId, int durationMinutes, int qualityRating, int sleepScore, float avgHeartRate, String firebaseUid) {
         if (firebaseUid == null || firebaseUid.isEmpty()) {
             Log.w("Sync", "Cannot sync session: No Firebase UID provided");
             return;
@@ -339,6 +342,7 @@ public class DatabaseManager {
         sessionData.put("duration_minutes", durationMinutes);
         sessionData.put("sleep_quality", qualityRating);
         sessionData.put("sleep_score", sleepScore);
+        sessionData.put("avg_heart_rate", avgHeartRate);
         sessionData.put("synced_at", FieldValue.serverTimestamp());
 
         docRef.set(sessionData, SetOptions.merge())

@@ -1,109 +1,105 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SignUp"
+    android:fillViewport="true"
     android:background="@android:color/black">
 
-    <Button
-        android:id="@+id/BackBtn"
-        android:layout_width="130dp"
-        android:layout_height="62dp"
-        android:layout_marginStart="56dp"
-        android:layout_marginBottom="140dp"
-        android:backgroundTint="#FFFFFF"
-        android:shadowColor="#FFFFFF"
-        android:text="Back"
-        android:textColor="#000000"
-        android:textColorHighlight="#FFFFFF"
-        android:textColorHint="#FFFFFF"
-        android:textColorLink="@color/white"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:strokeColor="#FFFFFF" />
-
-    <TextView
-        android:id="@+id/SignUpTextP"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="92dp"
-        android:text="Sign Up"
-        android:textColor="#FFFFFF"
-        android:textSize="34sp"
-        app:layout_constraintBottom_toTopOf="@+id/CreateUsername"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.533" />
+        android:orientation="vertical"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingTop="40dp"
+        android:paddingBottom="40dp">
 
-    <Button
-        android:id="@+id/SignUpBtn"
-        android:layout_width="130dp"
-        android:layout_height="62dp"
-        android:layout_marginEnd="60dp"
-        android:layout_marginBottom="140dp"
-        android:backgroundTint="#FFFFFF"
-        android:shadowColor="#FFFFFF"
-        android:text="Sign Up"
-        android:textColor="#000000"
-        android:textColorHighlight="#FFFFFF"
-        android:textColorHint="#FFFFFF"
-        android:textColorLink="@color/white"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toEndOf="@+id/BackBtn"
-        app:strokeColor="#FFFFFF" />
+        <!-- Sign Up Title -->
+        <TextView
+            android:id="@+id/SignUpTextP"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sign Up"
+            android:textColor="#FFFFFF"
+            android:textSize="34sp"
+            android:gravity="center"
+            android:layout_marginBottom="32dp"/>
 
-    <EditText
-        android:id="@+id/CreatePassword"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="40dp"
-        android:ems="10"
-        android:hint="Enter a password"
-        android:inputType="textPassword"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#FFFFFF"
-        app:layout_constraintBottom_toTopOf="@+id/RenterPass"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent" />
+        <!-- Username input -->
+        <EditText
+            android:id="@+id/CreateUsername"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter a username"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#FFFFFF"
+            android:inputType="text"
+            android:ems="10"
+            android:layout_marginBottom="16dp"
+            android:background="@android:drawable/editbox_background"
+            android:padding="12dp"/>
 
-    <EditText
-        android:id="@+id/RenterPass"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="56dp"
-        android:ems="10"
-        android:hint="Re-enter password"
-        android:inputType="textPassword"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#FFFFFF"
-        app:layout_constraintBottom_toTopOf="@+id/BackBtn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent" />
+        <!-- Password input -->
+        <EditText
+            android:id="@+id/CreatePassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter a password"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#FFFFFF"
+            android:inputType="textPassword"
+            android:ems="10"
+            android:layout_marginBottom="16dp"
+            android:background="@android:drawable/editbox_background"
+            android:padding="12dp"/>
 
-    <EditText
-        android:id="@+id/CreateUsername"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="44dp"
-        android:ems="10"
-        android:hint="Enter a username"
-        android:inputType="text"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#FFFFFF"
-        app:layout_constraintBottom_toTopOf="@+id/CreatePassword"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent" />
+        <!-- Re-enter password input -->
+        <EditText
+            android:id="@+id/RenterPass"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Re-enter password"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#FFFFFF"
+            android:inputType="textPassword"
+            android:ems="10"
+            android:layout_marginBottom="32dp"
+            android:background="@android:drawable/editbox_background"
+            android:padding="12dp"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- Buttons row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp">
+
+            <Button
+                android:id="@+id/BackBtn"
+                android:layout_width="0dp"
+                android:layout_height="62dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:text="Back"
+                android:textSize="20sp"
+                android:textColor="#000000"
+                android:backgroundTint="#FFFFFF"
+                android:shadowColor="#FFFFFF"/>
+
+            <Button
+                android:id="@+id/SignUpBtn"
+                android:layout_width="0dp"
+                android:layout_height="62dp"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:text="Sign Up"
+                android:textSize="20sp"
+                android:textColor="#000000"
+                android:backgroundTint="#FFFFFF"
+                android:shadowColor="#FFFFFF"/>
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

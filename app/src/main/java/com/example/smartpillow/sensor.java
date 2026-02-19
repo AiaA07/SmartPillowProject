@@ -1,19 +1,21 @@
 package com.example.smartpillow;
 
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
+//import androidx.cor1e.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import android.Manifest; //Added(for ppg)
@@ -24,6 +26,9 @@ import android.widget.Toast;
 public class sensor extends AppCompatActivity implements SensorEventListener {
 
 
+    private ImageView homeBtn3;
+    private ImageView statsBtn3;
+    private ImageView profileBtn3;
     private static final String TAG = "SensorActivity";
 
     private SensorManager sensorManager;
@@ -47,6 +52,14 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
         EdgeToEdge.enable(this);
         setContentView(R.layout.tracking_page);
 
+        homeBtn3 = findViewById(R.id.home3_Btn);
+        statsBtn3 = findViewById(R.id.stats3_Btn);
+        profileBtn3 = findViewById(R.id.profile3_Btn);
+
+        homeBtn3.setOnClickListener(v -> GotoHome3());
+        statsBtn3.setOnClickListener(v -> GoToStats3());
+        profileBtn3.setOnClickListener(v -> GoToProfile3());
+
         tvX = findViewById(R.id.TexttvX);
         tvY = findViewById(R.id.TexttvY);
         tvZ = findViewById(R.id.TexttvZ);
@@ -56,10 +69,10 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
 
         if (sensorManager != null) {
             accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            heartRateSensor = sensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
         }
 
         //Added(for ppg)
-        heartRateSensor = sensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
 
         if (accelerometer == null) {
             Log.w(TAG, "No accelerometer sensor found on this device.");
@@ -166,9 +179,30 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
             // Update UI
             tvHeartRate.setText("Heart Rate: " + heartRate + " bpm");
             Log.d(TAG, "Heart rate: " + heartRate + " bpm (accuracy=" + accuracy + ")");
+
+        // Add to collector if plausible and accuracy acceptable
+        if (heartRate > 30 && heartRate < 200 && accuracy >= SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM) {
+            HeartRateCollector.getInstance().addHeartRate(heartRate);
+        }
+
+
         }
     }
 
+    private void GotoHome3(){
+        Intent home3 =  new Intent(sensor.this, HomePage.class);
+        startActivity(home3);
+    }
+
+    private void GoToStats3(){
+        Intent stats3 = new Intent(sensor.this, StatsPage.class);
+        startActivity(stats3);
+    }
+
+    private void GoToProfile3(){
+        Intent profile3 = new Intent(sensor.this, ProfilePage.class);
+        startActivity(profile3);
+    }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {

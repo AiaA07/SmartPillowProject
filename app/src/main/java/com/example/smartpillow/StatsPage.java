@@ -30,6 +30,9 @@ public class StatsPage extends AppCompatActivity {
     private Handler timerHandler = new Handler();
     private DatabaseManager dbManager;
 
+    // TODO: get actual user ID from login
+    private long currentUserId = 1;
+
     private Runnable timerRunnable = new Runnable() {
         @Override
         public void run() {
@@ -90,6 +93,10 @@ public class StatsPage extends AppCompatActivity {
         startTime = SystemClock.uptimeMillis();
         timerHandler.postDelayed(timerRunnable, 0);
 
+        // Reset and start heart rate collector
+        HeartRateCollector.getInstance().reset();
+        HeartRateCollector.getInstance().startTracking();
+
         trackingStatusText.setText("TRACKING");
         sessionTimerText.setVisibility(View.VISIBLE);
         startTrackingBtn.setVisibility(View.GONE);
@@ -103,12 +110,15 @@ public class StatsPage extends AppCompatActivity {
         long millis = SystemClock.uptimeMillis() - startTime;
         int minutes = (int) (millis / 1000) / 60;
 
+        // Stop collector and get average heart rate
+        HeartRateCollector.getInstance().stopTracking();
+        float avgHeartRate = HeartRateCollector.getInstance().getAverageHeartRate();
 
         int simulatedQuality = 7;
         long userId = 1;
 
 
-        long sessionId = dbManager.insertSleepSession(userId, minutes, simulatedQuality);
+        long sessionId = dbManager.insertSleepSession(userId, minutes, simulatedQuality, avgHeartRate);
 
         if (sessionId != -1) {
             Toast.makeText(this, "Session Saved! Duration: " + minutes + " mins", Toast.LENGTH_LONG).show();
@@ -118,6 +128,12 @@ public class StatsPage extends AppCompatActivity {
         sessionTimerText.setVisibility(View.GONE);
         startTrackingBtn.setVisibility(View.VISIBLE);
         stopTrackingBtn.setVisibility(View.GONE);
+    }
+
+    // TODO: Replace with actual Firebase UID retrieval
+    private String getFirebaseUid() {
+        // If using Firebase Auth, return FirebaseAuth.getInstance().getCurrentUser().getUid()
+        return null;
     }
 
     @Override
