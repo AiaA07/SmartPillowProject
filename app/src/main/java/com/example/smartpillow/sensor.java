@@ -50,6 +50,9 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
 
     private static final int PERMISSION_REQUEST_BODY_SENSORS = 100; //Added(for ppg)
 
+    private DatabaseManager dbManager; //Added(for gyroscope)
+    private long currentSessionId = -1; //Added(for gyroscope)
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,6 +102,11 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
             tvGyroY.setText("Gyro Y: not available");
             tvGyroZ.setText("Gyro Z: not available");
         }
+
+        //Added(for gyroscope)
+        dbManager = new DatabaseManager(this);
+        dbManager.open();
+        currentSessionId = 1; // replace with real session ID later
 
         //Added(for ppg)
         // Request permission for heart rate sensor (required for Android 6+)
@@ -159,6 +167,7 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
     protected void onPause() {
         super.onPause();
         sensorManager.unregisterListener(this);
+        if (dbManager != null) dbManager.close(); //Added(for gyroscope)
     }
 
     @Override
@@ -219,6 +228,12 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
             tvGyroY.setText("Gyro Y: " + gyroY + " rad/s");
             tvGyroZ.setText("Gyro Z: " + gyroZ + " rad/s");
             Log.d(TAG, "Gyroscope: X=" + gyroX + " Y=" + gyroY + " Z=" + gyroZ);
+
+            // Save to database //Added(for gyroscope)
+            double magnitude = Math.sqrt(gyroX * gyroX + gyroY * gyroY + gyroZ * gyroZ);
+            if (currentSessionId != -1) {
+                dbManager.saveRawSensorData(currentSessionId, 2, magnitude);
+            }
         }
     }
 
