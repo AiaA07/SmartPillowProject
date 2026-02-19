@@ -201,6 +201,12 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
                 lastUpdate = currentTime;
                 Log.d(TAG, "Accelerometer: X=" + x + " Y=" + y + " Z=" + z);
             }
+
+            // Save accelerometer magnitude to database //Added(for accelerometer saving)
+            double magnitude = Math.sqrt(x * x + y * y + z * z);
+            if (currentSessionId != -1) {
+                dbManager.saveRawSensorData(currentSessionId, 1, magnitude);
+            }
         }
         // Handle heart rate
         else if (event.sensor.getType() == Sensor.TYPE_HEART_RATE) {
