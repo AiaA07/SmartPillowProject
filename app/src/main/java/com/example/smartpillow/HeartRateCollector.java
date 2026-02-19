@@ -7,6 +7,7 @@ public class HeartRateCollector {
     private static HeartRateCollector instance;
     private List<Float> heartRates = new ArrayList<>();
     private boolean isTracking = false;
+    private float lastHeartRate = 0; // New field for most recent valid reading
 
     private HeartRateCollector() {}
 
@@ -20,12 +21,23 @@ public class HeartRateCollector {
     public void startTracking() {
         heartRates.clear();
         isTracking = true;
+        lastHeartRate = 0;
     }
 
     public void addHeartRate(float value) {
-        if (isTracking && value > 30 && value < 200) { // plausibility check
+        if (isTracking && value > 30 && value < 200) {
             heartRates.add(value);
         }
+    }
+
+    public void setLastHeartRate(float value) {
+        if (isTracking && value > 30 && value < 200) {
+            lastHeartRate = value;
+        }
+    }
+
+    public float getLastHeartRate() {
+        return lastHeartRate;
     }
 
     public float getAverageHeartRate() {
@@ -42,6 +54,6 @@ public class HeartRateCollector {
     public void reset() {
         heartRates.clear();
         isTracking = false;
+        lastHeartRate = 0;
     }
-
 }

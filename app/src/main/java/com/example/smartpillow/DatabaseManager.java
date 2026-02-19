@@ -237,7 +237,7 @@ public class DatabaseManager {
     /**
      * The 70/30 Weighted Algorithm Logic
      */
-    private int calculateScoreLogic(int durationMinutes, int qualityRating) {
+    public int calculateScoreLogic(int durationMinutes, int qualityRating) {
         double durationScore = (durationMinutes / 480.0) * 100; // 480 mins = 8 hours
         if (durationScore > 100) durationScore = 100;
         return (int) ((durationScore * 0.7) + (qualityRating * 10 * 0.3));
