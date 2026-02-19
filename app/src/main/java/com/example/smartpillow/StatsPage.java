@@ -1,8 +1,15 @@
 package com.example.smartpillow;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -12,13 +19,16 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.google.firebase.auth.FirebaseAuth;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Locale;
 
-public class StatsPage extends AppCompatActivity {
+public class StatsPage extends AppCompatActivity implements SensorEventListener {
 
     // UI elements
     private ImageView homeBtn2, trackingBtn2, profileBtn2;
@@ -38,20 +48,26 @@ public class StatsPage extends AppCompatActivity {
     // TODO: Replace with actual logged-in user ID
     private long currentUserId = 1;
 
-    // Timer runnable
+    // Sensor related
+    private SensorManager sensorManager;
+    private Sensor heartRateSensor;
+    private static final int PERMISSION_REQUEST_BODY_SENSORS = 100;
+
+    // Timer runnable (HH:MM:SS format)
     private Runnable timerRunnable = new Runnable() {
         @Override
         public void run() {
             long millis = SystemClock.uptimeMillis() - startTime;
-            int seconds = (int) (millis / 1000);
-            int minutes = seconds / 60;
-            seconds = seconds % 60;
-            sessionTimerText.setText(String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds));
+            int totalSeconds = (int) (millis / 1000);
+            int hours = totalSeconds / 3600;
+            int minutes = (totalSeconds % 3600) / 60;
+            int seconds = totalSeconds % 60;
+            sessionTimerText.setText(String.format(Locale.getDefault(), "%02d:%02d:%02d", hours, minutes, seconds));
             timerHandler.postDelayed(this, 500);
         }
     };
 
-    // Live heart rate updater
+    // Live heart rate updater (now just updates from collector)
     private Runnable hrRunnable = new Runnable() {
         @Override
         public void run() {
@@ -62,7 +78,7 @@ public class StatsPage extends AppCompatActivity {
                 } else {
                     heartRateText.setText("-- bpm");
                 }
-                hrHandler.postDelayed(this, 1000); // update every second
+                hrHandler.postDelayed(this, 1000);
             }
         }
     };
@@ -71,6 +87,12 @@ public class StatsPage extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.stats_page);
+
+        // Initialize sensor manager
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        if (sensorManager != null) {
+            heartRateSensor = sensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
+        }
 
         // Initialize database
         dbManager = new DatabaseManager(this);
@@ -103,9 +125,28 @@ public class StatsPage extends AppCompatActivity {
 
         // Load the most recent session (if any)
         loadLatestSessionData();
+
+        // Check for heart rate sensor
+        if (heartRateSensor == null) {
+            Toast.makeText(this, "Heart rate sensor not available", Toast.LENGTH_LONG).show();
+        }
     }
 
     private void startTracking() {
+        // Request permission if not granted
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BODY_SENSORS)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.BODY_SENSORS},
+                    PERMISSION_REQUEST_BODY_SENSORS);
+            return; // Wait for permission result
+        }
+
+        // Permission already granted, start tracking
+        doStartTracking();
+    }
+
+    private void doStartTracking() {
         isTracking = true;
         startTime = SystemClock.uptimeMillis();
         timerHandler.postDelayed(timerRunnable, 0);
@@ -113,6 +154,11 @@ public class StatsPage extends AppCompatActivity {
         // Reset and start heart rate collector
         HeartRateCollector.getInstance().reset();
         HeartRateCollector.getInstance().startTracking();
+
+        // Register heart rate sensor listener
+        if (heartRateSensor != null) {
+            sensorManager.registerListener(this, heartRateSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
 
         // Start live heart rate updates
         hrHandler.post(hrRunnable);
@@ -124,10 +170,25 @@ public class StatsPage extends AppCompatActivity {
         stopTrackingBtn.setVisibility(View.VISIBLE);
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_REQUEST_BODY_SENSORS) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                doStartTracking();
+            } else {
+                Toast.makeText(this, "Heart rate permission denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     private void stopTracking() {
         isTracking = false;
         timerHandler.removeCallbacks(timerRunnable);
-        hrHandler.removeCallbacks(hrRunnable); // stop live heart rate updates
+        hrHandler.removeCallbacks(hrRunnable);
+
+        // Unregister heart rate sensor
+        sensorManager.unregisterListener(this);
 
         // Calculate duration
         long millis = SystemClock.uptimeMillis() - startTime;
@@ -143,12 +204,11 @@ public class StatsPage extends AppCompatActivity {
         long sessionId = dbManager.insertSleepSession(currentUserId, minutes, simulatedQuality, avgHeartRate);
 
         if (sessionId != -1) {
-            Toast.makeText(this, "Session Saved! Duration: " + minutes + " mins", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Session Saved! Duration: " + minutes + " mins, Avg HR: " + avgHeartRate, Toast.LENGTH_LONG).show();
 
-            //Sync to Firebase if user is logged in
+            // Sync to Firebase if user is logged in
             String firebaseUid = getFirebaseUid();
             if (firebaseUid != null) {
-                // Compute score (same logic as in DatabaseManager)
                 int score = dbManager.calculateScoreLogic(minutes, simulatedQuality);
                 dbManager.syncSingleSessionToFirebase(sessionId, currentUserId, minutes,
                         simulatedQuality, score, avgHeartRate, firebaseUid);
@@ -165,9 +225,26 @@ public class StatsPage extends AppCompatActivity {
         stopTrackingBtn.setVisibility(View.GONE);
     }
 
-    /**
-     * Query the database for the most recent sleep session and update the summary cards.
-     */
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if (event.sensor.getType() == Sensor.TYPE_HEART_RATE) {
+            float heartRate = event.values[0];
+            int accuracy = event.accuracy;
+
+            Log.d(TAG, "Heart rate raw: " + heartRate + ", accuracy=" + accuracy);
+
+            // Add to collector if plausible (ignore accuracy for now)
+            if (heartRate > 30 && heartRate < 200) {
+                HeartRateCollector.getInstance().addHeartRate(heartRate);
+            }
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        // Not needed
+    }
+
     private void loadLatestSessionData() {
         Cursor cursor = dbManager.fetchLatestSession(currentUserId);
         if (cursor != null && cursor.moveToFirst()) {
@@ -196,14 +273,12 @@ public class StatsPage extends AppCompatActivity {
             }
             cursor.close();
         } else {
-            // No sessions yet
             sleepDurationText.setText("--");
             sleepQualityText.setText("--");
             heartRateText.setText("-- bpm");
             recentDataText.setText("No sleep data yet");
         }
     }
-
 
     private String getFirebaseUid() {
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
@@ -217,12 +292,12 @@ public class StatsPage extends AppCompatActivity {
         super.onDestroy();
         timerHandler.removeCallbacks(timerRunnable);
         hrHandler.removeCallbacks(hrRunnable);
+        sensorManager.unregisterListener(this);
         if (dbManager != null) {
             dbManager.close();
         }
     }
 
-    // Navigation methods
     private void GotoHome2() {
         Intent home2 = new Intent(StatsPage.this, HomePage.class);
         startActivity(home2);
@@ -237,4 +312,6 @@ public class StatsPage extends AppCompatActivity {
         Intent profile2 = new Intent(StatsPage.this, ProfilePage.class);
         startActivity(profile2);
     }
+
+    private static final String TAG = "StatsPage";
 }

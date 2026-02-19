@@ -30,42 +30,42 @@
             android:id="@+id/CreateUsername"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter a username"
-            android:textColor="#FFFFFF"
-            android:textColorHint="#FFFFFF"
-            android:inputType="text"
-            android:ems="10"
             android:layout_marginBottom="16dp"
             android:background="@android:drawable/editbox_background"
-            android:padding="12dp"/>
+            android:ems="10"
+            android:hint="Enter a username"
+            android:inputType="text"
+            android:padding="12dp"
+            android:textColor="#000000"
+            android:textColorHint="#000000" />
 
         <!-- Password input -->
         <EditText
             android:id="@+id/CreatePassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter a password"
-            android:textColor="#FFFFFF"
-            android:textColorHint="#FFFFFF"
-            android:inputType="textPassword"
-            android:ems="10"
             android:layout_marginBottom="16dp"
             android:background="@android:drawable/editbox_background"
-            android:padding="12dp"/>
+            android:ems="10"
+            android:hint="Enter a password"
+            android:inputType="textPassword"
+            android:padding="12dp"
+            android:textColor="#000000"
+            android:textColorHint="#000000" />
 
         <!-- Re-enter password input -->
         <EditText
             android:id="@+id/RenterPass"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Re-enter password"
-            android:textColor="#FFFFFF"
-            android:textColorHint="#FFFFFF"
-            android:inputType="textPassword"
-            android:ems="10"
             android:layout_marginBottom="32dp"
             android:background="@android:drawable/editbox_background"
-            android:padding="12dp"/>
+            android:ems="10"
+            android:hint="Re-enter password"
+            android:inputType="textPassword"
+            android:padding="12dp"
+            android:textColor="#000000"
+            android:textColorHint="#000000" />
 
         <!-- Buttons row -->
         <LinearLayout

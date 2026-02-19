@@ -42,30 +42,30 @@
             android:id="@+id/UsernameText"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:hint="@string/username"
-            android:textColor="#FFFFFF"
-            android:textColorHint="#FFFFFF"
-            android:inputType="text"
-            android:autofillHints="username"
-            android:importantForAutofill="yes"
-            android:ems="10"
             android:layout_marginBottom="16dp"
-            android:background="@android:drawable/editbox_background"/>
+            android:autofillHints="username"
+            android:background="@android:drawable/editbox_background"
+            android:ems="10"
+            android:hint="@string/username"
+            android:importantForAutofill="yes"
+            android:inputType="text"
+            android:textColor="#000000"
+            android:textColorHint="#000000" />
 
         <!-- Password -->
         <EditText
             android:id="@+id/PasswordText"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:hint="Password"
-            android:textColor="#FFFFFF"
-            android:textColorHint="#FFFFFF"
-            android:inputType="textPassword"
-            android:autofillHints="password"
-            android:importantForAutofill="yes"
-            android:ems="10"
             android:layout_marginBottom="24dp"
+            android:autofillHints="password"
             android:background="@android:drawable/editbox_background"
+            android:ems="10"
+            android:hint="Password"
+            android:importantForAutofill="yes"
+            android:inputType="textPassword"
+            android:textColor="#000000"
+            android:textColorHint="#050505"
             tools:ignore="WearPasswordInput" />
 
         <!-- Login Button -->
