@@ -184,16 +184,16 @@ public class LoginPage extends AppCompatActivity {
 
             if (cursor != null && cursor.moveToFirst()) {
                 do {
-                    String dbUsername = cursor.getString(1);
-                    String dbPassword = cursor.getString(2);
-                    String dbEmail = cursor.getString(3);
-                    String dbPhone = cursor.getString(4);
-                    String dbGender = cursor.getString(5);
-                    int dbAge = cursor.getInt(6);
-                    int dbHeight = cursor.getInt(7);
-                    int dbWeight = cursor.getInt(8);
-                    int dbSleepDuration = cursor.getInt(9);
-                    int dbSleepQuality = cursor.getInt(10);
+                    String dbUsername = cursor.getString(2);
+                    String dbPassword = cursor.getString(3);
+                    String dbEmail = cursor.getString(4);
+                    String dbPhone = cursor.getString(5);
+                    String dbGender = cursor.getString(6);
+                    int dbAge = cursor.getInt(7);
+                    int dbHeight = cursor.getInt(8);
+                    int dbWeight = cursor.getInt(9);
+                    int dbSleepDuration = cursor.getInt(10);
+                    int dbSleepQuality = cursor.getInt(11);
 
                     // Sync this data to Firestore
                     Map<String, Object> userData = new HashMap<>();

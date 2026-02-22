@@ -208,11 +208,15 @@ public class StatsPage extends AppCompatActivity implements SensorEventListener 
 
             // Sync to Firebase if user is logged in
             String firebaseUid = getFirebaseUid();
+            Log.d("StatsPage", "Firebase UID: " + firebaseUid);
             if (firebaseUid != null) {
                 int score = dbManager.calculateScoreLogic(minutes, simulatedQuality);
                 dbManager.syncSingleSessionToFirebase(sessionId, currentUserId, minutes,
                         simulatedQuality, score, avgHeartRate, firebaseUid);
+            } else {
+                Log.e("StatsPage", "User not logged in – cannot sync to Firebase");
             }
+
 
             // Refresh the display with the new session data
             loadLatestSessionData();
