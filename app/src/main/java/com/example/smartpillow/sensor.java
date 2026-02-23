@@ -15,11 +15,10 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-//import androidx.cor1e.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import android.Manifest; //Added(for ppg)
-import android.content.pm.PackageManager; //Added(for ppg)
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.widget.Toast;
 
 
@@ -34,8 +33,8 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
     private SensorManager sensorManager;
     private Sensor accelerometer;
 
-    private Sensor heartRateSensor; //Added(for ppg)
-    private Sensor gyroscope; //Added(for gyroscope)
+    private Sensor heartRateSensor;
+    private Sensor gyroscope;
 
     private long lastUpdate = 0L;
     private static final long UPDATE_INTERVAL_MS = 200L;
@@ -43,15 +42,18 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
     private TextView tvX;
     private TextView tvY;
     private TextView tvZ;
-    private TextView tvHeartRate; //Added(for ppg)
-    private TextView tvGyroX; //Added(for gyroscope)
-    private TextView tvGyroY; //Added(for gyroscope)
-    private TextView tvGyroZ; //Added(for gyroscope)
+    private TextView tvHeartRate;
+    private TextView tvGyroX;
+    private TextView tvGyroY;
+    private TextView tvGyroZ;
 
-    private static final int PERMISSION_REQUEST_BODY_SENSORS = 100; //Added(for ppg)
+    private static final int PERMISSION_REQUEST_BODY_SENSORS = 100;
+    private static final int PERMISSION_REQUEST_RECORD_AUDIO = 101;  // ← NEW: Microphone permission code
 
-    private DatabaseManager dbManager; //Added(for gyroscope)
-    private long currentSessionId = -1; //Added(for gyroscope)
+    private DatabaseManager dbManager;
+    private long currentSessionId = -1;
+
+    private Microphone microphone;  // ← NEW: Microphone instance
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,32 +72,28 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
         tvX = findViewById(R.id.TexttvX);
         tvY = findViewById(R.id.TexttvY);
         tvZ = findViewById(R.id.TexttvZ);
-        tvHeartRate = findViewById(R.id.tvHeartRate); //Added(for ppg)
-        tvGyroX = findViewById(R.id.tvGyroX); //Added(for gyroscope)
-        tvGyroY = findViewById(R.id.tvGyroY); //Added(for gyroscope)
-        tvGyroZ = findViewById(R.id.tvGyroZ); //Added(for gyroscope)
+        tvHeartRate = findViewById(R.id.tvHeartRate);
+        tvGyroX = findViewById(R.id.tvGyroX);
+        tvGyroY = findViewById(R.id.tvGyroY);
+        tvGyroZ = findViewById(R.id.tvGyroZ);
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
         if (sensorManager != null) {
             accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
             heartRateSensor = sensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
-            gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE); //Added(for gyroscope)
+            gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
         }
-
-        //Added(for ppg)
 
         if (accelerometer == null) {
             Log.w(TAG, "No accelerometer sensor found on this device.");
         }
 
-        //Added(for ppg)
-        if (heartRateSensor == null) {                     // ADDED
+        if (heartRateSensor == null) {
             Log.w(TAG, "No heart rate sensor found on this device.");
             tvHeartRate.setText("Heart Rate: not available");
         }
 
-        //Added(for gyroscope)
         if (gyroscope == null) {
             Log.w(TAG, "No gyroscope sensor found on this device.");
             tvGyroX.setText("Gyro X: not available");
@@ -103,12 +101,10 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
             tvGyroZ.setText("Gyro Z: not available");
         }
 
-        //Added(for gyroscope)
         dbManager = new DatabaseManager(this);
         dbManager.open();
-        currentSessionId = 1; // replace with real session ID later
+        currentSessionId = 1;
 
-        //Added(for ppg)
         // Request permission for heart rate sensor (required for Android 6+)
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.BODY_SENSORS)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -116,12 +112,54 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
                     new String[]{Manifest.permission.BODY_SENSORS},
                     PERMISSION_REQUEST_BODY_SENSORS);
         } else {
-            registerSensors();   // ADDED – helper method to register both sensors
+            registerSensors();
         }
 
+        // ← NEW: Request microphone permission with privacy popup
+        requestMicrophonePermission();
     }
 
-    // ADDED: handle permission result
+    // ← NEW: Shows privacy explanation dialog before requesting microphone permission
+    private void requestMicrophonePermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Show privacy explanation dialog BEFORE the system permission prompt
+            new android.app.AlertDialog.Builder(this)
+                    .setTitle("Microphone Access")
+                    .setMessage("SmartPillow uses the microphone to detect ambient noise levels " +
+                            "during sleep (e.g., snoring, room noise).\n\n" +
+                            "We do NOT record or store any audio — only decibel levels are saved.\n\n" +
+                            "You can deny this permission and still use other sensors.")
+                    .setPositiveButton("Allow", (dialog, which) -> {
+                        // User agreed, now show the system permission dialog
+                        ActivityCompat.requestPermissions(sensor.this,
+                                new String[]{Manifest.permission.RECORD_AUDIO},
+                                PERMISSION_REQUEST_RECORD_AUDIO);
+                    })
+                    .setNegativeButton("Deny", (dialog, which) -> {
+                        Toast.makeText(this, "Microphone permission denied. " +
+                                "Noise tracking will be unavailable.", Toast.LENGTH_SHORT).show();
+                    })
+                    .setCancelable(false)
+                    .show();
+        } else {
+            // Permission already granted, start microphone
+            startMicrophone();
+        }
+    }
+
+    // ← NEW: Starts the microphone for decibel tracking
+    private void startMicrophone() {
+        microphone = new Microphone(this);
+        if (microphone.start()) {
+            Log.d(TAG, "Microphone started successfully");
+        } else {
+            Log.w(TAG, "Failed to start microphone");
+        }
+    }
+
+    // UPDATED: Now handles BOTH body sensor AND microphone permission results
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -132,9 +170,16 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
                 Toast.makeText(this, "Heart rate permission denied", Toast.LENGTH_SHORT).show();
             }
         }
+        // ← NEW: Handle microphone permission result
+        else if (requestCode == PERMISSION_REQUEST_RECORD_AUDIO) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startMicrophone();
+            } else {
+                Toast.makeText(this, "Microphone permission denied", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
-    // ADDED: helper to register sensors (called when permission granted)
     private void registerSensors() {
         if (accelerometer != null) {
             sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
@@ -142,7 +187,7 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
         if (heartRateSensor != null) {
             sensorManager.registerListener(this, heartRateSensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
-        if (gyroscope != null) { //Added(for gyroscope)
+        if (gyroscope != null) {
             sensorManager.registerListener(this, gyroscope, SensorManager.SENSOR_DELAY_NORMAL);
         }
     }
@@ -153,29 +198,33 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
         if (accelerometer != null) {
             sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
         }
-        // Register heart rate only if permission granted
         if (heartRateSensor != null &&
                 ContextCompat.checkSelfPermission(this, Manifest.permission.BODY_SENSORS) == PackageManager.PERMISSION_GRANTED) {
             sensorManager.registerListener(this, heartRateSensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
-        if (gyroscope != null) { //Added(for gyroscope)
+        if (gyroscope != null) {
             sensorManager.registerListener(this, gyroscope, SensorManager.SENSOR_DELAY_NORMAL);
         }
     }
 
+    // UPDATED: Now also cleans up microphone
     @Override
     protected void onPause() {
         super.onPause();
         sensorManager.unregisterListener(this);
-        if (dbManager != null) dbManager.close(); //Added(for gyroscope)
+        // ← NEW: Release microphone when leaving activity
+        if (microphone != null) {
+            microphone.release();
+            microphone = null;
+        }
+        if (dbManager != null) dbManager.close();
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
 
-
         Log.d(TAG, "onSensorChanged: type=" + event.sensor.getType());
-        // Handle accelerometer
+
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             long currentTime = System.currentTimeMillis();
 
@@ -183,12 +232,10 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
             float y = event.values[1];
             float z = event.values[2];
 
-            // Update UI
             tvX.setText("X: " + x);
             tvY.setText("Y: " + y);
             tvZ.setText("Z: " + z);
 
-            // Sleep metric implementation
             float minX = -10;
             float maxX = 10;
             if (x >= minX && x <= maxX)
@@ -196,35 +243,27 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
             else
                 tvX.setText("X: " + x + " (Abnormal)");
 
-            // Optional throttling
             if ((currentTime - lastUpdate) >= UPDATE_INTERVAL_MS) {
                 lastUpdate = currentTime;
                 Log.d(TAG, "Accelerometer: X=" + x + " Y=" + y + " Z=" + z);
             }
 
-            // Save accelerometer magnitude to database //Added(for accelerometer saving)
             double magnitude = Math.sqrt(x * x + y * y + z * z);
             if (currentSessionId != -1) {
                 dbManager.saveRawSensorData(currentSessionId, 1, magnitude);
             }
         }
-        // Handle heart rate
         else if (event.sensor.getType() == Sensor.TYPE_HEART_RATE) {
             float heartRate = event.values[0];
             int accuracy = event.accuracy;
 
-            // Update UI
             tvHeartRate.setText("Heart Rate: " + heartRate + " bpm");
             Log.d(TAG, "Heart rate: " + heartRate + " bpm (accuracy=" + accuracy + ")");
 
-            // Add to collector if plausible and accuracy acceptable
             if (heartRate > 30 && heartRate < 200 && accuracy >= SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM) {
                 HeartRateCollector.getInstance().addHeartRate(heartRate);
             }
-
-
         }
-        // Handle gyroscope //Added(for gyroscope)
         else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
             float gyroX = event.values[0];
             float gyroY = event.values[1];
@@ -235,7 +274,6 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
             tvGyroZ.setText("Gyro Z: " + gyroZ + " rad/s");
             Log.d(TAG, "Gyroscope: X=" + gyroX + " Y=" + gyroY + " Z=" + gyroZ);
 
-            // Save to database //Added(for gyroscope)
             double magnitude = Math.sqrt(gyroX * gyroX + gyroY * gyroY + gyroZ * gyroZ);
             if (currentSessionId != -1) {
                 dbManager.saveRawSensorData(currentSessionId, 2, magnitude);
