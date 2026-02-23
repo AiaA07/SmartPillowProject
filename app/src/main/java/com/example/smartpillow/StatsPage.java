@@ -45,8 +45,8 @@ public class StatsPage extends AppCompatActivity implements SensorEventListener 
     // Database
     private DatabaseManager dbManager;
 
-    // TODO: Replace with actual logged-in user ID
-    private long currentUserId = 1;
+
+    private long currentUserId;
 
     // Sensor related
     private SensorManager sensorManager;
@@ -87,6 +87,16 @@ public class StatsPage extends AppCompatActivity implements SensorEventListener 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.stats_page);
+
+        //NEW: Retrieve local user ID from intent (passed from HomePage)
+        currentUserId = getIntent().getLongExtra("LOCAL_USER_ID", -1);
+        if (currentUserId == -1) {
+            Log.e(TAG, "No valid user ID passed – using fallback 1");
+            currentUserId = 1; // fallback for testing
+        } else {
+            Log.d(TAG, "Using local user ID: " + currentUserId);
+        }
+
 
         // Initialize sensor manager
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);

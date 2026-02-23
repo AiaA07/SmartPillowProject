@@ -28,6 +28,9 @@ public class HomePage extends AppCompatActivity {
     private Handler tipsHandler;
     private Random random;
 
+    // ADD: DatabaseManager for local DB access
+    private DatabaseManager dbManager;
+
     private final String[] sleepTips = {
             "Maintain a consistent sleep schedule, even on weekends.",
             "Create a relaxing bedtime routine.",
@@ -56,6 +59,10 @@ public class HomePage extends AppCompatActivity {
         tipsHandler = new Handler();
         random = new Random();
 
+        // ADD: Initialize DatabaseManager
+        dbManager = new DatabaseManager(this);
+        dbManager.open();
+
         initializeViews();
         setupUserWelcome();
         loadSleepGoalFromFirestore();
@@ -67,8 +74,22 @@ public class HomePage extends AppCompatActivity {
         goalTextView = findViewById(R.id.GoalTextView);
         tipsTextView = findViewById(R.id.TipsTextView);
 
-        // Navigation
-        findViewById(R.id.Stats_Btn).setOnClickListener(v -> startActivity(new Intent(this, StatsPage.class)));
+        // MODIFY: Stats_Btn click listener to pass local user ID
+        findViewById(R.id.Stats_Btn).setOnClickListener(v -> {
+            // Get the username from Firebase (or from intent if you passed it from login)
+            String username = getUsernameFromFirebase();
+            if (username != null) {
+                // Retrieve local SQLite user ID using the username
+                long localUserId = dbManager.getUserIdByUsername(username);
+                Intent intent = new Intent(HomePage.this, StatsPage.class);
+                intent.putExtra("LOCAL_USER_ID", localUserId);
+                startActivity(intent);
+            } else {
+                // Fallback: if no user logged in, just go to StatsPage with default
+                startActivity(new Intent(HomePage.this, StatsPage.class));
+            }
+        });
+
         findViewById(R.id.Tracking_Btn).setOnClickListener(v -> startActivity(new Intent(this, sensor.class)));
         findViewById(R.id.Profile_Btn).setOnClickListener(v -> startActivity(new Intent(this, ProfilePage.class)));
 
@@ -77,7 +98,7 @@ public class HomePage extends AppCompatActivity {
         setGoalBtn.setOnClickListener(v -> showSleepGoalDialog());
 
         // Remove the input layout from view since we're using dialog
-      //  findViewById(R.id.GoalInputLayout).setVisibility(android.view.View.GONE);
+        // findViewById(R.id.GoalInputLayout).setVisibility(android.view.View.GONE);
     }
 
     private void setupUserWelcome() {
@@ -157,9 +178,9 @@ public class HomePage extends AppCompatActivity {
                             String goalText;
 
                             if (goalObj != null) {
-                                goalText = String.valueOf(goalObj);  // Convert number or string safely
+                                goalText = String.valueOf(goalObj);
                             } else {
-                                goalText = "8"; // default if somehow null
+                                goalText = "8"; // default
                             }
 
                             goalTextView.setText("Current Goal: " + goalText + " hours per night");
@@ -173,7 +194,6 @@ public class HomePage extends AppCompatActivity {
                     });
         }
     }
-
 
     private void setupTipsRotation() {
         showRandomTip();
@@ -195,6 +215,10 @@ public class HomePage extends AppCompatActivity {
         super.onDestroy();
         if (tipsHandler != null) {
             tipsHandler.removeCallbacksAndMessages(null);
+        }
+        // ADD: Close database
+        if (dbManager != null) {
+            dbManager.close();
         }
     }
 }

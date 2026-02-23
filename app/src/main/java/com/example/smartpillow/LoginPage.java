@@ -51,7 +51,6 @@ public class LoginPage extends AppCompatActivity {
         login.setOnClickListener(v -> LoginUser());
     }
 
-
     private void LoginUser() {
         String inputUsername = username.getText().toString().trim();
         String inputPassword = password.getText().toString().trim();
@@ -87,7 +86,7 @@ public class LoginPage extends AppCompatActivity {
                         // Step 3: Sync sleep sessions to Firebase
                         long localUserId = dbManager.getUserIdByUsername(username);
                         if (localUserId != -1) {
-                           dbManager.syncSleepSessionsToFirebase(localUserId, userId);
+                            dbManager.syncSleepSessionsToFirebase(localUserId, userId);
                         }
 
                         // Step 4: Proceed to home page
@@ -124,7 +123,6 @@ public class LoginPage extends AppCompatActivity {
 
     private boolean validateUserInSQLite(String username, String password) {
         try {
-            // Use BCrypt verification instead of direct string comparison
             return dbManager.checkPassword(username, password);
         } catch (Exception e) {
             Log.e("Login", "SQLite validation error: " + e.getMessage());
@@ -145,18 +143,46 @@ public class LoginPage extends AppCompatActivity {
         }
     }
 
+    /**
+     * Improved method: tries to create a Firebase account; if that fails (user exists),
+     * attempts to sign in with the same credentials.
+     */
     private void attemptFirebaseSyncAfterSQLLogin(String username, String password, String email) {
-        // Try to create Firebase account for this SQLite user
+        // Try to create a new Firebase account
         auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
+                        // Account created successfully
                         String userId = auth.getCurrentUser().getUid();
                         Log.d("Login", "Created Firebase account for SQLite user: " + username);
-
-                        // Sync SQLite data to Firestore
                         syncUserDataToFirestore(username, email, userId);
+
+                        // Sync any existing sleep sessions
+                        long localUserId = dbManager.getUserIdByUsername(username);
+                        if (localUserId != -1) {
+                            dbManager.syncSleepSessionsToFirebase(localUserId, userId);
+                        }
                     } else {
-                        Log.d("Login", "Could not create Firebase account (user may exist): " + task.getException().getMessage());
+                        // Creation failed – maybe the user already exists, try signing in
+                        Log.d("Login", "Firebase account creation failed, attempting sign-in: " +
+                                task.getException().getMessage());
+                        auth.signInWithEmailAndPassword(email, password)
+                                .addOnCompleteListener(signInTask -> {
+                                    if (signInTask.isSuccessful()) {
+                                        String userId = auth.getCurrentUser().getUid();
+                                        Log.d("Login", "Signed in existing Firebase user: " + username);
+                                        syncUserDataToFirestore(username, email, userId);
+
+                                        // Sync any existing sleep sessions
+                                        long localUserId = dbManager.getUserIdByUsername(username);
+                                        if (localUserId != -1) {
+                                            dbManager.syncSleepSessionsToFirebase(localUserId, userId);
+                                        }
+                                    } else {
+                                        Log.e("Login", "Could not sign in after SQLite login: " +
+                                                signInTask.getException().getMessage());
+                                    }
+                                });
                     }
                 });
     }
@@ -195,7 +221,6 @@ public class LoginPage extends AppCompatActivity {
                     int dbSleepDuration = cursor.getInt(10);
                     int dbSleepQuality = cursor.getInt(11);
 
-                    // Sync this data to Firestore
                     Map<String, Object> userData = new HashMap<>();
                     userData.put("username", dbUsername);
                     userData.put("email", dbEmail);
