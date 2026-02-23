@@ -230,13 +230,17 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
             float gyroY = event.values[1];
             float gyroZ = event.values[2];
 
-            tvGyroX.setText("Gyro X: " + gyroX + " rad/s");
+            // Save to database and check Normal/Abnormal //Added(for gyroscope normal/abnormal)
+            double magnitude = Math.sqrt(gyroX * gyroX + gyroY * gyroY + gyroZ * gyroZ);
+            if (magnitude < 0.5)
+                tvGyroX.setText("Gyro: " + magnitude + " (Normal)");
+            else
+                tvGyroX.setText("Gyro: " + magnitude + " (Abnormal)");
+
             tvGyroY.setText("Gyro Y: " + gyroY + " rad/s");
             tvGyroZ.setText("Gyro Z: " + gyroZ + " rad/s");
             Log.d(TAG, "Gyroscope: X=" + gyroX + " Y=" + gyroY + " Z=" + gyroZ);
 
-            // Save to database //Added(for gyroscope)
-            double magnitude = Math.sqrt(gyroX * gyroX + gyroY * gyroY + gyroZ * gyroZ);
             if (currentSessionId != -1) {
                 dbManager.saveRawSensorData(currentSessionId, 2, magnitude);
             }
