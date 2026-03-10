@@ -55,8 +55,4 @@ public class TrackingPage extends AppCompatActivity {
     }
 
 
-
-
-
-
 }

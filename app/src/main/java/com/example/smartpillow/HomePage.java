@@ -90,7 +90,13 @@ public class HomePage extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.Tracking_Btn).setOnClickListener(v -> startActivity(new Intent(this, sensor.class)));
+        findViewById(R.id.Tracking_Btn).setOnClickListener(v -> {
+            String username = getUsernameFromFirebase();
+            long localUserId = username != null ? dbManager.getUserIdByUsername(username) : -1;
+            Intent intent = new Intent(this, sensor.class);
+            intent.putExtra("LOCAL_USER_ID", localUserId);
+            startActivity(intent);
+        });
         findViewById(R.id.Profile_Btn).setOnClickListener(v -> startActivity(new Intent(this, ProfilePage.class)));
 
         // Set Sleep Goal button - now using dialog

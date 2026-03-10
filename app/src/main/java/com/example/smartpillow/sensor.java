@@ -103,7 +103,15 @@ public class sensor extends AppCompatActivity implements SensorEventListener {
 
         dbManager = new DatabaseManager(this);
         dbManager.open();
-        currentSessionId = 1;
+        dbManager = new DatabaseManager(this);
+        dbManager.open();
+        long userId = getIntent().getLongExtra("LOCAL_USER_ID", -1);
+        if (userId == -1) {
+            Log.w(TAG, "No user ID passed – using fallback session 1");
+            currentSessionId = 1;
+        } else {
+            currentSessionId = userId;
+        }
 
         // Request permission for heart rate sensor (required for Android 6+)
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.BODY_SENSORS)
