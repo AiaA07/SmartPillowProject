@@ -1,7 +1,5 @@
 package com.example.smartpillow;
 
-import static androidx.core.content.ContextCompat.startActivity;
-
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -27,8 +25,6 @@ public class HomePage extends AppCompatActivity {
     private FirebaseFirestore db;
     private Handler tipsHandler;
     private Random random;
-
-    // ADD: DatabaseManager for local DB access
     private DatabaseManager dbManager;
 
     private final String[] sleepTips = {
@@ -59,7 +55,6 @@ public class HomePage extends AppCompatActivity {
         tipsHandler = new Handler();
         random = new Random();
 
-        // ADD: Initialize DatabaseManager
         dbManager = new DatabaseManager(this);
         dbManager.open();
 
@@ -74,18 +69,14 @@ public class HomePage extends AppCompatActivity {
         goalTextView = findViewById(R.id.GoalTextView);
         tipsTextView = findViewById(R.id.TipsTextView);
 
-        // MODIFY: Stats_Btn click listener to pass local user ID
         findViewById(R.id.Stats_Btn).setOnClickListener(v -> {
-            // Get the username from Firebase (or from intent if you passed it from login)
             String username = getUsernameFromFirebase();
             if (username != null) {
-                // Retrieve local SQLite user ID using the username
                 long localUserId = dbManager.getUserIdByUsername(username);
                 Intent intent = new Intent(HomePage.this, StatsPage.class);
                 intent.putExtra("LOCAL_USER_ID", localUserId);
                 startActivity(intent);
             } else {
-                // Fallback: if no user logged in, just go to StatsPage with default
                 startActivity(new Intent(HomePage.this, StatsPage.class));
             }
         });
@@ -97,14 +88,17 @@ public class HomePage extends AppCompatActivity {
             intent.putExtra("LOCAL_USER_ID", localUserId);
             startActivity(intent);
         });
-        findViewById(R.id.Profile_Btn).setOnClickListener(v -> startActivity(new Intent(this, ProfilePage.class)));
 
-        // Set Sleep Goal button - now using dialog
+        // FIXED: Now passing the username extra to ProfilePage
+        findViewById(R.id.Profile_Btn).setOnClickListener(v -> {
+            String username = getUsernameFromFirebase();
+            Intent intent = new Intent(HomePage.this, ProfilePage.class);
+            intent.putExtra("USERNAME", username);
+            startActivity(intent);
+        });
+
         Button setGoalBtn = findViewById(R.id.SetGoalBtn);
         setGoalBtn.setOnClickListener(v -> showSleepGoalDialog());
-
-        // Remove the input layout from view since we're using dialog
-        // findViewById(R.id.GoalInputLayout).setVisibility(android.view.View.GONE);
     }
 
     private void setupUserWelcome() {
@@ -115,7 +109,7 @@ public class HomePage extends AppCompatActivity {
     private String getUsernameFromFirebase() {
         if (auth.getCurrentUser() != null) {
             String email = auth.getCurrentUser().getEmail();
-            if (email != null && email.contains("@smartpillow.com")) {
+            if (email != null && email.contains("@")) {
                 return email.split("@")[0];
             }
         }
@@ -139,9 +133,7 @@ public class HomePage extends AppCompatActivity {
             }
         });
         builder.setNegativeButton("Cancel", null);
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        builder.create().show();
     }
 
     private void saveSleepGoalToFirestore(String goal) {
@@ -164,9 +156,7 @@ public class HomePage extends AppCompatActivity {
                         goalTextView.setText("Current Goal: " + goal + " hours per night");
                         Toast.makeText(HomePage.this, "Sleep goal saved!", Toast.LENGTH_SHORT).show();
                     })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(HomePage.this, "Failed to save goal", Toast.LENGTH_SHORT).show();
-                    });
+                    .addOnFailureListener(e -> Toast.makeText(HomePage.this, "Failed to save goal", Toast.LENGTH_SHORT).show());
 
         } catch (NumberFormatException e) {
             Toast.makeText(this, "Please enter a valid number", Toast.LENGTH_SHORT).show();
@@ -179,25 +169,13 @@ public class HomePage extends AppCompatActivity {
             db.collection("users").document(userId).get()
                     .addOnSuccessListener(documentSnapshot -> {
                         if (documentSnapshot.exists() && documentSnapshot.contains("sleepGoal")) {
-
                             Object goalObj = documentSnapshot.get("sleepGoal");
-                            String goalText;
-
-                            if (goalObj != null) {
-                                goalText = String.valueOf(goalObj);
-                            } else {
-                                goalText = "8"; // default
-                            }
-
-                            goalTextView.setText("Current Goal: " + goalText + " hours per night");
-
+                            goalTextView.setText("Current Goal: " + String.valueOf(goalObj) + " hours per night");
                         } else {
                             goalTextView.setText("No sleep goal set");
                         }
                     })
-                    .addOnFailureListener(e -> {
-                        goalTextView.setText("No sleep goal set");
-                    });
+                    .addOnFailureListener(e -> goalTextView.setText("No sleep goal set"));
         }
     }
 
@@ -219,12 +197,7 @@ public class HomePage extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (tipsHandler != null) {
-            tipsHandler.removeCallbacksAndMessages(null);
-        }
-        // ADD: Close database
-        if (dbManager != null) {
-            dbManager.close();
-        }
+        if (tipsHandler != null) tipsHandler.removeCallbacksAndMessages(null);
+        if (dbManager != null) dbManager.close();
     }
 }
