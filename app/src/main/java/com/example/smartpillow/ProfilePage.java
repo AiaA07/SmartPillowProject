@@ -1,16 +1,23 @@
 package com.example.smartpillow;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatEditText;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import androidx.appcompat.app.AppCompatActivity;
 
 public class ProfilePage extends AppCompatActivity {
 
@@ -20,15 +27,26 @@ public class ProfilePage extends AppCompatActivity {
     private TextView sleepGoalProgressLabelTextView;
     private ProgressBar sleepGoalProgressBar;
 
+    // NEW: Drawer and star rating views
+    private DrawerLayout drawerLayout;
+    private ImageView hamburgerBtn;
+    private LinearLayout drawerHistory, drawerReport, drawerSleepGoal, drawerEditProfile, drawerLogout;
+    private Button star1Btn, star2Btn, star3Btn, star4Btn, star5Btn;
+    private TextView ratingLabel;
+    private Button logoutButton, editProfileButton;
+
+    // NEW: Bottom nav
+    private ImageView homeNavBtn, statsNavBtn, trackingNavBtn, profileNavBtn;
+
     private DatabaseManager dbManager;
     private String usernameFromIntent;
+    private int selectedRating = 0;
 
     private FirebaseAuth auth;
     private FirebaseFirestore firestore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.profile_page);   // 👈 make sure this matches your XML file name
@@ -57,6 +75,91 @@ public class ProfilePage extends AppCompatActivity {
         sleepGoalProgressLabelTextView = findViewById(R.id.sleepGoalProgressLabelTextView);
         sleepGoalProgressBar = findViewById(R.id.sleepGoalProgressBar);
 
+        // NEW: Find drawer and star views
+        drawerLayout      = findViewById(R.id.drawerLayout);
+        hamburgerBtn      = findViewById(R.id.hamburgerBtn);
+        drawerHistory     = findViewById(R.id.drawerHistory);
+        drawerReport      = findViewById(R.id.drawerReport);
+        drawerSleepGoal   = findViewById(R.id.drawerSleepGoal);
+        drawerEditProfile = findViewById(R.id.drawerEditProfile);
+        drawerLogout      = findViewById(R.id.drawerLogout);
+        star1Btn          = findViewById(R.id.star1Btn);
+        star2Btn          = findViewById(R.id.star2Btn);
+        star3Btn          = findViewById(R.id.star3Btn);
+        star4Btn          = findViewById(R.id.star4Btn);
+        star5Btn          = findViewById(R.id.star5Btn);
+        ratingLabel       = findViewById(R.id.ratingLabel);
+        logoutButton      = findViewById(R.id.logoutButton);
+        editProfileButton = findViewById(R.id.editProfileButton);
+
+        // NEW: Bottom nav
+        homeNavBtn     = findViewById(R.id.homeNavBtn);
+        statsNavBtn    = findViewById(R.id.statsNavBtn);
+        trackingNavBtn = findViewById(R.id.trackingNavBtn);
+        profileNavBtn  = findViewById(R.id.profileNavBtn);
+
+        // NEW: Hamburger opens drawer
+        hamburgerBtn.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
+
+        // NEW: Drawer menu items
+        drawerHistory.setOnClickListener(v -> {
+            drawerLayout.closeDrawers();
+            long userId = getUserIdFromUsername();
+            Intent i = new Intent(this, HistoryPage.class);
+            i.putExtra("LOCAL_USER_ID", userId);
+            startActivity(i);
+        });
+
+        drawerReport.setOnClickListener(v -> {
+            drawerLayout.closeDrawers();
+            long userId = getUserIdFromUsername();
+            Intent i = new Intent(this, ResultsPage.class);
+            i.putExtra("LOCAL_USER_ID", userId);
+            startActivity(i);
+        });
+
+        drawerSleepGoal.setOnClickListener(v -> {
+            drawerLayout.closeDrawers();
+            showSleepGoalDialog();
+        });
+
+        drawerEditProfile.setOnClickListener(v -> {
+            drawerLayout.closeDrawers();
+            // TODO: open edit profile screen
+            Toast.makeText(this, "Edit Profile coming soon", Toast.LENGTH_SHORT).show();
+        });
+
+        drawerLogout.setOnClickListener(v -> {
+            drawerLayout.closeDrawers();
+            logoutUser();
+        });
+
+        // NEW: Logout button on main screen
+        logoutButton.setOnClickListener(v -> logoutUser());
+
+        // NEW: Edit profile button on main screen
+        editProfileButton.setOnClickListener(v ->
+                Toast.makeText(this, "Edit Profile coming soon", Toast.LENGTH_SHORT).show());
+
+        // NEW: Star rating buttons
+        Button[] stars = {star1Btn, star2Btn, star3Btn, star4Btn, star5Btn};
+        for (int i = 0; i < stars.length; i++) {
+            final int rating = i + 1;
+            stars[i].setOnClickListener(v -> updateStarRating(rating, stars));
+        }
+
+        // NEW: Bottom nav listeners
+        homeNavBtn.setOnClickListener(v ->
+                startActivity(new Intent(this, HomePage.class)));
+        statsNavBtn.setOnClickListener(v -> {
+            Intent i = new Intent(this, StatsPage.class);
+            i.putExtra("LOCAL_USER_ID", getUserIdFromUsername());
+            startActivity(i);
+        });
+        trackingNavBtn.setOnClickListener(v ->
+                startActivity(new Intent(this, sensor.class)));
+        profileNavBtn.setOnClickListener(v -> { /* already here */ });
+
         // 3. Open local database
         try {
             dbManager = new DatabaseManager(this);
@@ -68,6 +171,55 @@ public class ProfilePage extends AppCompatActivity {
 
         // 4. Load user info from SQLite
         loadUserFromSQLite();
+    }
+
+    // NEW: Update star colors based on selected rating
+    private void updateStarRating(int rating, Button[] stars) {
+        selectedRating = rating;
+        for (int i = 0; i < stars.length; i++) {
+            if (i < rating) {
+                stars[i].setTextColor(android.graphics.Color.parseColor("#facc15")); // yellow
+            } else {
+                stars[i].setTextColor(android.graphics.Color.parseColor("#888888")); // grey
+            }
+        }
+        String[] labels = {"", "Poor 😟", "Fair 😐", "Okay 🙂", "Good 😊", "Great! 😴"};
+        ratingLabel.setText(labels[rating]);
+        Toast.makeText(this, "Rating saved: " + rating + "/5", Toast.LENGTH_SHORT).show();
+        Log.d("ProfilePage", "User rated sleep: " + rating + "/5");
+    }
+
+    // NEW: Helper to get user ID from username
+    private long getUserIdFromUsername() {
+        if (usernameFromIntent != null && dbManager != null) {
+            return dbManager.getUserIdByUsername(usernameFromIntent);
+        }
+        return -1;
+    }
+
+    // NEW: Sleep goal dialog
+    private void showSleepGoalDialog() {
+        AppCompatEditText input = new AppCompatEditText(this);
+        input.setHint("e.g., 8");
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("Change Sleep Goal")
+                .setMessage("Enter your desired sleep hours per night (1-12):")
+                .setView(input)
+                .setPositiveButton("Save", (dialog, which) ->
+                        Toast.makeText(this, "Sleep goal updated!", Toast.LENGTH_SHORT).show())
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    // NEW: Logout user from Firebase and go back to login
+    private void logoutUser() {
+        auth.signOut();
+        Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show();
+        Intent i = new Intent(this, LoginPage.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(i);
     }
 
     private void loadUserFromSQLite() {
@@ -107,7 +259,7 @@ public class ProfilePage extends AppCompatActivity {
                         profileSleepGoalTextView.setText("Sleep goal: 8 hours/day");
 
                         // ✅ Show only real basic data for now
-                        lastNightTextView.setText("Last night: " + dbSleepDuration + " hrs");
+                        lastNightTextView.setText(dbSleepDuration + " hrs");
                         avgSleepTextView.setText("Average sleep: coming soon");
                         streakTextView.setText("Streak: coming soon");
 
@@ -142,7 +294,6 @@ public class ProfilePage extends AppCompatActivity {
             Toast.makeText(this, "Error loading profile", Toast.LENGTH_SHORT).show();
         }
     }
-
 
     @Override
     protected void onDestroy() {

@@ -65,6 +65,9 @@
             android:taskAffinity="" >
 
         </activity>
+
+        <activity android:name=".ResultsPage" android:exported="false" android:taskAffinity="" />
+        <activity android:name=".HistoryPage" android:exported="false" android:taskAffinity="" />
     </application>
 
 </manifest>
