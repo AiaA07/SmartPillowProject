@@ -29,6 +29,13 @@ public class DatabaseManager {
     public void open() throws SQLException {
         db = dbHelper.getWritableDatabase();
     }
+    /**
+     * Checks if the database is currently open.
+     * Prevents "Database closed" crashes during sensor data collection.
+     */
+    public boolean isOpen() {
+        return db != null && db.isOpen();
+    }
 
     public void close() {
         if (db != null && db.isOpen()) {
