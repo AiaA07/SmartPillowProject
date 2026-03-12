@@ -68,6 +68,9 @@
 
         <activity android:name=".ResultsPage" android:exported="false" android:taskAffinity="" />
         <activity android:name=".HistoryPage" android:exported="false" android:taskAffinity="" />
+        <activity android:name=".ReportPage" android:exported="false" />
+        <activity android:name=".SleepGoalActivity" android:exported="false" />
+
     </application>
 
 </manifest>

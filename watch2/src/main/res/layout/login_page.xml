@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.wear.widget.BoxInsetLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/black"
@@ -10,6 +11,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         app:layout_box="all">
 
         <LinearLayout
@@ -17,93 +19,77 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center_horizontal"
-            android:paddingBottom="16dp">
+            android:paddingBottom="40dp"> <TextView
+            android:id="@+id/TitleText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="SmartPillow"
+            android:textColor="#FFFFFF"
+            android:textSize="24sp"
+            android:textStyle="bold" />
 
-            <!-- App Title (smaller) -->
-            <TextView
-                android:id="@+id/TitleText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/smartpillow"
-                android:textColor="#FFFFFF"
-                android:textSize="28sp"
-                android:textStyle="bold" />
-
-            <!-- Instruction text -->
             <TextView
                 android:id="@+id/LoginTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="4dp"
                 android:text="Login or Sign Up"
                 android:textColor="#FFFFFF"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
 
-            <!-- Username field -->
             <EditText
                 android:id="@+id/UsernameText"
-                android:layout_width="match_parent"
+                android:layout_width="140dp"
                 android:layout_height="48dp"
                 android:layout_marginTop="12dp"
-                android:layout_marginHorizontal="8dp"
+                android:layout_gravity="center_horizontal"
                 android:hint="Username"
                 android:inputType="text"
                 android:textColor="#FFFFFF"
                 android:textColorHint="#AAAAAA"
-                android:background="@android:drawable/editbox_background"
+                android:background="#333333"
                 android:paddingHorizontal="8dp"
+                android:textSize="14sp"
                 android:autofillHints="username" />
 
-            <!-- Password field -->
             <EditText
                 android:id="@+id/PasswordText"
-                android:layout_width="match_parent"
+                android:layout_width="140dp"
                 android:layout_height="48dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginHorizontal="8dp"
+                android:layout_gravity="center_horizontal"
                 android:hint="Password"
                 android:inputType="textPassword"
+                android:imeOptions="actionDone"
                 android:textColor="#FFFFFF"
                 android:textColorHint="#AAAAAA"
-                android:background="@android:drawable/editbox_background"
+                android:background="#333333"
                 android:paddingHorizontal="8dp"
-                android:autofillHints="password" />
+                android:textSize="14sp"
+                android:autofillHints="password"
+                tools:ignore="WearPasswordInput" />
 
-            <!-- Login Button -->
             <Button
                 android:id="@+id/Loginbtn"
-                android:layout_width="match_parent"
+                android:layout_width="140dp"
                 android:layout_height="48dp"
                 android:layout_marginTop="12dp"
-                android:layout_marginHorizontal="8dp"
+                android:layout_gravity="center_horizontal"
                 android:text="Login"
-                android:textSize="16sp"
                 android:backgroundTint="#FFFFFF"
                 android:textColor="#000000" />
 
-            <!-- Hint for new users (simplified) -->
-            <TextView
-                android:id="@+id/SignUpText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="New user? Sign Up"
-                android:textColor="#BBBBBB"
-                android:textSize="14sp" />
-
-            <!-- Sign Up Button -->
             <Button
                 android:id="@+id/SignUpBtn"
-                android:layout_width="match_parent"
+                android:layout_width="140dp"
                 android:layout_height="48dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginHorizontal="8dp"
+                android:layout_gravity="center_horizontal"
                 android:text="Sign Up"
-                android:textSize="16sp"
                 android:backgroundTint="#FAFAFA"
                 android:textColor="#000000" />
 
         </LinearLayout>
     </ScrollView>
-</androidx.wear.widget.BoxInsetLayout>
+</FrameLayout>

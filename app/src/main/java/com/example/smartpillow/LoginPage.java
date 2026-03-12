@@ -89,7 +89,7 @@ public class LoginPage extends AppCompatActivity {
                             dbManager.syncSleepSessionsToFirebase(localUserId, userId);
                         }
 
-                        // Step 4: Proceed to home page
+                        // Step 4: Proceed to home.png page
                         completeLogin(username);
 
                     } else {

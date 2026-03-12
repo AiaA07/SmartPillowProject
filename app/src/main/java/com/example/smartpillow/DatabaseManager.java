@@ -193,7 +193,24 @@ public class DatabaseManager {
                 new String[]{String.valueOf(sessionId)},
                 null, null, DatabaseHelper.COLUMN_RAW_TIMESTAMP + " ASC");
     }
+    /**
+     * Updates the user's daily sleep goal.
+     * Maps to the COLUMN_SLEEP_DURATION in the main user table.
+     */
+    public boolean updateSleepGoal(String username, int newGoal) {
+        ContentValues values = new ContentValues();
 
+        values.put(DatabaseHelper.COLUMN_SLEEP_DURATION, newGoal);
+
+        int rowsAffected = db.update(
+                DatabaseHelper.TABLE_NAME,
+                values,
+                DatabaseHelper.COLUMN_USERNAME + " = ?",
+                new String[]{username}
+        );
+
+        return rowsAffected > 0;
+    }
     //
 
     /**

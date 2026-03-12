@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.wear.widget.BoxInsetLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -84,10 +84,11 @@
 
                             <Button
                                 android:id="@+id/start_tracking_btn"
-                                android:layout_width="match_parent"
+                                android:layout_width="140dp"
                                 android:layout_height="48dp"
-                                android:layout_marginBottom="4dp"
-                                android:background="#4CAF50"
+                                android:layout_marginBottom="8dp"
+                                android:layout_gravity="center_horizontal"
+                                android:backgroundTint="#2E7D32"
                                 android:text="Start Tracking"
                                 android:textColor="#FFFFFF"
                                 android:textSize="14sp"
@@ -95,11 +96,12 @@
 
                             <Button
                                 android:id="@+id/stop_tracking_btn"
-                                android:layout_width="match_parent"
+                                android:layout_width="140dp"
                                 android:layout_height="48dp"
+                                android:layout_gravity="center_horizontal"
+                                android:backgroundTint="#C62828"
                                 android:text="Stop Tracking"
                                 android:textColor="#FFFFFF"
-                                android:background="#F44336"
                                 android:textSize="14sp"
                                 android:textStyle="bold"
                                 android:visibility="gone" />
@@ -548,4 +550,4 @@
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-</androidx.wear.widget.BoxInsetLayout>
+</FrameLayout>

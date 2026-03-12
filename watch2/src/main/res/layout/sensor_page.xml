@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:padding="16dp"
+            android:paddingBottom="40dp">
+
+            <TextView
+                android:id="@+id/SensorTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sleep Tracking"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/HeartRateText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="HR: -- bpm"
+                android:textColor="#4CAF50"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/StatusText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Status: Ready"
+                android:textColor="#AAAAAA"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/start_tracking_btn"
+                android:layout_width="140dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="16dp"
+                android:text="Start"
+                android:backgroundTint="#2E7D32"
+                android:textColor="#FFFFFF" />
+
+            <Button
+                android:id="@+id/stop_tracking_btn"
+                android:layout_width="140dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:text="Stop"
+                android:backgroundTint="#C62828"
+                android:textColor="#FFFFFF"
+                android:visibility="gone" />
+
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>
