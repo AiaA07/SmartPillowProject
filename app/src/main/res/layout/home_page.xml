@@ -25,8 +25,7 @@
             android:text="Home"
             android:textColor="#FFFFFF"
             android:textSize="36sp"
-            android:textStyle="bold"
-            android:letterSpacing="0.02" />
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/WelcomeText"
@@ -36,7 +35,6 @@
             android:text="Welcome, User!"
             android:textColor="#E0E0E0"
             android:textSize="18sp" />
-
     </LinearLayout>
 
     <LinearLayout
@@ -76,9 +74,7 @@
             android:layout_marginTop="16dp"
             android:backgroundTint="#4CAF50"
             android:text="Set Sleep Goal"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textColor="@android:color/white" />
 
         <Button
             android:id="@+id/btnSimulateSleep"
@@ -86,9 +82,7 @@
             android:layout_height="50dp"
             android:layout_marginTop="12dp"
             android:backgroundTint="#BB86FC"
-            android:text="Simulate Session"
-            android:textColor="@android:color/white"
-            android:textSize="14sp" />
+            android:text="Simulate Session" />
 
         <TextView
             android:id="@+id/tvDemoResult"
@@ -98,7 +92,6 @@
             android:text="Ready for demo"
             android:textColor="#AAAAAA"
             android:textSize="12sp" />
-
     </LinearLayout>
 
     <LinearLayout
@@ -114,35 +107,15 @@
         app:layout_constraintTop_toBottomOf="@+id/sleepGoalSection">
 
         <TextView
-            android:id="@+id/TipsText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Sleep Tips"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <TextView
             android:id="@+id/TipsTextView"
             android:layout_width="280dp"
             android:layout_height="120dp"
             android:layout_marginTop="16dp"
             android:gravity="center"
-            android:lineSpacingExtra="6dp"
             android:text="Loading sleep tips..."
             android:textColor="#E0E0E0"
-            android:textSize="14sp"
             android:padding="16dp"
             android:background="#1E1E1E" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Tip rotates every 15 seconds"
-            android:textColor="#666666"
-            android:textSize="10sp" />
-
     </LinearLayout>
 
     <LinearLayout
@@ -151,25 +124,19 @@
         android:layout_height="70dp"
         android:background="@android:color/white"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
-            android:id="@+id/home_tab"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:orientation="vertical"
-            android:clickable="true"
-            android:focusable="true">
+            android:orientation="vertical">
             <ImageView android:layout_width="32dp" android:layout_height="32dp" android:src="@drawable/home" />
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Home" android:textColor="@android:color/black" android:textSize="12sp" />
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/stats_tab"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -180,7 +147,6 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/tracking_tab"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -191,7 +157,6 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/profile_tab"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -201,5 +166,4 @@
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Profile" android:textColor="@android:color/black" android:textSize="12sp" />
         </LinearLayout>
     </LinearLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>
